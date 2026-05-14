@@ -1,0 +1,48 @@
+# =========================
+# Windows
+# =========================
+Thumbs.db
+Desktop.ini
+
+# =========================
+# Visual Studio / .NET
+# =========================
+.vs/
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.pdb
+*.cache
+*.log
+
+# =========================
+# ASP.NET Core sensitive config
+# =========================
+appsettings.Development.json
+.env
+
+# =========================
+# Node / React / Vite
+# =========================
+node_modules/
+dist/
+build/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# OS / editor files
+# =========================
+.DS_Store
