@@ -1,6 +1,4 @@
 @SmartKindergarten.Api_HostAddress = http://localhost:5224
 
-GET {{SmartKindergarten.Api_HostAddress}}/weatherforecast/
-Accept: application/json
 
 ###
