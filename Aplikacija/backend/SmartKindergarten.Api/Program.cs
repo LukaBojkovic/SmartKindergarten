@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SmartKindergarten.Api.Data;
+using SmartKindergarten.Api.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +13,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddCors(options =>
 {
@@ -21,6 +27,39 @@ builder.Services.AddCors(options =>
     });
 });
 
+string? jwtKey = builder.Configuration["Jwt:Key"];
+string? issuer = builder.Configuration["Jwt:Issuer"];
+string? audience = builder.Configuration["Jwt:Audience"];
+
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    throw new InvalidOperationException("JWT key nije podešen u appsettings.json fajlu.");
+}
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+
+        ValidateIssuer = true,
+        ValidIssuer = issuer,
+
+        ValidateAudience = true,
+        ValidAudience = audience,
+
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -30,7 +69,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseCors("AllowReactApp");
+
+app.UseAuthentication();
+
 app.UseAuthorization();
+
 app.MapControllers();
+
+await InitialData.InitializeAsync(app.Services);
 app.Run();
