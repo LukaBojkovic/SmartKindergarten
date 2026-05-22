@@ -38,6 +38,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ChildService>();
+builder.Services.AddScoped<GroupService>();
 
 builder.Services.AddCors(options =>
 {

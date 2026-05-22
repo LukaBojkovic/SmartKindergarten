@@ -98,6 +98,29 @@ namespace SmartKindergarten.Api.Controllers
             return NoContent();
         }
 
+        [HttpPost("{childId}/parents/{parentId}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> AssignParentToChild(int childId, int parentId)
+        {
+            var result = await _childService.AssignParentToChildAsync(childId, parentId);
+
+            if (!result.Success)
+                return BadRequest(result.Error);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{childId}/parents/{parentId}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> RemoveParentFromChild(int childId, int parentId)
+        {
+            var result = await _childService.RemoveParentFromChildAsync(childId, parentId);
+
+            if (!result.Success)
+                return BadRequest(result.Error);
+
+            return NoContent();
+        }
         private int GetCurrentUserId()
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

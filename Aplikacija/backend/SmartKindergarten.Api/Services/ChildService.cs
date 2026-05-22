@@ -153,6 +153,54 @@ namespace SmartKindergarten.Api.Services
             return true;
         }
 
+        public async Task<(bool Success, string? Error)> AssignParentToChildAsync(int childId, int parentId)
+        {
+            Child? child = await _context.Children.FindAsync(childId);
+
+            if (child == null)
+                return (false, "Dete nije pronađeno.");
+
+            User? parent = await _context.Users.FindAsync(parentId);
+
+            if (parent == null)
+                return (false, "Korisnik nije pronađen.");
+
+            if (parent.Role != UserRole.Parent)
+                return (false, "Izabrani korisnik nije roditelj.");
+
+            bool relationExists = await _context.ParentChildren
+                .AnyAsync(pc => pc.ChildId == childId && pc.ParentId == parentId);
+
+            if (relationExists)
+                return (false, "Roditelj je već povezan sa ovim detetom.");
+
+            ParentChild parentChild = new ParentChild
+            {
+                ChildId = childId,
+                Child = child,
+                ParentId = parentId,
+                Parent = parent
+            };
+
+            _context.ParentChildren.Add(parentChild);
+            await _context.SaveChangesAsync();
+
+            return (true, null);
+        }
+
+        public async Task<(bool Success, string? Error)> RemoveParentFromChildAsync(int childId, int parentId)
+        {
+            ParentChild? parentChild = await _context.ParentChildren
+                .FirstOrDefaultAsync(pc => pc.ChildId == childId && pc.ParentId == parentId);
+
+            if (parentChild == null)
+                return (false, "Roditelj nije povezan sa ovim detetom.");
+
+            _context.ParentChildren.Remove(parentChild);
+            await _context.SaveChangesAsync();
+
+            return (true, null);
+        }
         private IQueryable<Child> BuildVisibleChildrenQuery(int currentUserId, string currentUserRole)
         {
             IQueryable<Child> query = _context.Children
