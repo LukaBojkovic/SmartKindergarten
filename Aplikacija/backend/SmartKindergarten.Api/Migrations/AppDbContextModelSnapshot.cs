@@ -305,6 +305,30 @@ namespace SmartKindergarten.Api.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("SmartKindergarten.Api.Models.SystemSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SystemSettings");
+                });
+
             modelBuilder.Entity("SmartKindergarten.Api.Models.TeacherGroup", b =>
                 {
                     b.Property<int>("TeacherId")

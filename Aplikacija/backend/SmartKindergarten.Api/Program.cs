@@ -39,6 +39,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ChildService>();
 builder.Services.AddScoped<GroupService>();
+builder.Services.AddScoped<DevelopmentProfileService>();
 
 builder.Services.AddCors(options =>
 {

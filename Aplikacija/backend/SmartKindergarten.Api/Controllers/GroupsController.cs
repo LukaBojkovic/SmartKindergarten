@@ -51,11 +51,7 @@ namespace SmartKindergarten.Api.Controllers
             if (!result.Success)
                 return BadRequest(result.Error);
 
-            return CreatedAtAction(
-                nameof(GetById),    
-                new { id = result.Group!.Id },
-                result.Group
-            );
+            return CreatedAtAction(nameof(GetById), new { id = result.Group!.Id }, result.Group);
         }
 
         [HttpPut("{id}")]
