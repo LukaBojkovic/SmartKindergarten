@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import TemporaryPage from "./pages/TemporaryPage";
+import UsersPage from "./pages/UsersPage";
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
           path="/users"
           element={
             <ProtectedRoute allowedRoles={["Administrator"]}>
-              <TemporaryPage
+              <UsersPage
                 title="Korisnici"
                 description="Pregled i upravljanje korisničkim nalozima."
               />
