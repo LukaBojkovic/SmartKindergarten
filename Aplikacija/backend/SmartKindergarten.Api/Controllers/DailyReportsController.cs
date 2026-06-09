@@ -1,10 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SmartKindergarten.Api.Data;
 using SmartKindergarten.Api.DTOs.DailyReports;
-using SmartKindergarten.Api.Models;
+using SmartKindergarten.Api.Services;
 
 namespace SmartKindergarten.Api.Controllers
 {
@@ -13,121 +11,70 @@ namespace SmartKindergarten.Api.Controllers
     [Authorize]
     public class DailyReportsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly DailyReportService _dailyReportService;
 
-        public DailyReportsController(AppDbContext context)
+        public DailyReportsController(DailyReportService dailyReportService)
         {
-            _context = context;
+            _dailyReportService = dailyReportService;
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Teacher,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator,Teacher,Parent,AdministrativeStaff")]
         public async Task<ActionResult<List<DailyReportResponseDto>>> GetAll()
         {
-            var reports = await _context.DailyReports
-                .OrderByDescending(r => r.ReportDate)
-                .Select(r => new DailyReportResponseDto
-                {
-                    Id = r.Id,
-                    GroupId = r.GroupId,
-                    TeacherId = r.TeacherId,
-                    Title = r.Title,
-                    Content = r.Content,
-                    ImageUrl = r.ImageUrl,
-                    ReportDate = r.ReportDate
-                })
-                .ToListAsync();
+            var result = await _dailyReportService.GetAllAsync(
+                GetCurrentUserId(),
+                GetCurrentUserRole());
 
-            return Ok(reports);
+            if (!result.Success)
+                return BadRequest(result.Error);
+
+            return Ok(result.Reports);
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Administrator,Teacher,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator,Teacher,Parent,AdministrativeStaff")]
         public async Task<ActionResult<DailyReportResponseDto>> GetById(int id)
         {
-            var report = await _context.DailyReports
-                .Where(r => r.Id == id)
-                .Select(r => new DailyReportResponseDto
-                {
-                    Id = r.Id,
-                    GroupId = r.GroupId,
-                    TeacherId = r.TeacherId,
-                    Title = r.Title,
-                    Content = r.Content,
-                    ImageUrl = r.ImageUrl,
-                    ReportDate = r.ReportDate
-                })
-                .FirstOrDefaultAsync();
+            var result = await _dailyReportService.GetByIdAsync(
+                id,
+                GetCurrentUserId(),
+                GetCurrentUserRole());
 
-            if (report == null)
-                return NotFound("Dnevni izveštaj nije pronađen.");
+            if (!result.Success)
+                return NotFound(result.Error);
 
-            return Ok(report);
+            return Ok(result.Report);
         }
 
         [HttpGet("group/{groupId}")]
-        [Authorize(Roles = "Administrator,Teacher,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator,Teacher,Parent,AdministrativeStaff")]
         public async Task<ActionResult<List<DailyReportResponseDto>>> GetByGroup(int groupId)
         {
-            var reports = await _context.DailyReports
-                .Where(r => r.GroupId == groupId)
-                .OrderByDescending(r => r.ReportDate)
-                .Select(r => new DailyReportResponseDto
-                {
-                    Id = r.Id,
-                    GroupId = r.GroupId,
-                    TeacherId = r.TeacherId,
-                    Title = r.Title,
-                    Content = r.Content,
-                    ImageUrl = r.ImageUrl,
-                    ReportDate = r.ReportDate
-                })
-                .ToListAsync();
+            var result = await _dailyReportService.GetByGroupAsync(
+                groupId,
+                GetCurrentUserId(),
+                GetCurrentUserRole());
 
-            return Ok(reports);
+            if (!result.Success)
+                return BadRequest(result.Error);
+
+            return Ok(result.Reports);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrator,Teacher")]
+        [Authorize(Roles = "Teacher")]
         public async Task<ActionResult<DailyReportResponseDto>> Create(CreateDailyReportRequestDto request)
         {
-            var teacherId = GetCurrentUserId();
+            var result = await _dailyReportService.CreateAsync(
+                request,
+                GetCurrentUserId(),
+                GetCurrentUserRole());
 
-            var group = await _context.KindergartenGroups.FindAsync(request.GroupId);
-            if (group == null)
-                return BadRequest("Grupa nije pronađena.");
+            if (!result.Success)
+                return BadRequest(result.Error);
 
-            var teacher = await _context.Users.FindAsync(teacherId);
-            if (teacher == null)
-                return BadRequest("Korisnik nije pronađen.");
-
-            var report = new DailyReport
-            {
-                GroupId = request.GroupId,
-                Group = group,
-                TeacherId = teacherId,
-                Teacher = teacher,
-                Title = request.Title,
-                Content = request.Content,
-                ImageUrl = request.ImageUrl,
-                ReportDate = request.ReportDate ?? DateTime.UtcNow
-            };
-
-            _context.DailyReports.Add(report);
-            await _context.SaveChangesAsync();
-
-            var response = new DailyReportResponseDto
-            {
-                Id = report.Id,
-                GroupId = report.GroupId,
-                TeacherId = report.TeacherId,
-                Title = report.Title,
-                Content = report.Content,
-                ImageUrl = report.ImageUrl,
-                ReportDate = report.ReportDate
-            };
-
-            return Ok(response);
+            return Ok(result.Report);
         }
 
         [HttpPut("{id}")]
@@ -136,45 +83,29 @@ namespace SmartKindergarten.Api.Controllers
             int id,
             UpdateDailyReportRequestDto request)
         {
-            var report = await _context.DailyReports.FindAsync(id);
+            var result = await _dailyReportService.UpdateAsync(
+                id,
+                request,
+                GetCurrentUserId(),
+                GetCurrentUserRole());
 
-            if (report == null)
-                return NotFound("Dnevni izveštaj nije pronađen.");
+            if (!result.Success)
+                return BadRequest(result.Error);
 
-            report.Title = request.Title;
-            report.Content = request.Content;
-            report.ImageUrl = request.ImageUrl;
-
-            if (request.ReportDate.HasValue)
-                report.ReportDate = request.ReportDate.Value;
-
-            await _context.SaveChangesAsync();
-
-            var response = new DailyReportResponseDto
-            {
-                Id = report.Id,
-                GroupId = report.GroupId,
-                TeacherId = report.TeacherId,
-                Title = report.Title,
-                Content = report.Content,
-                ImageUrl = report.ImageUrl,
-                ReportDate = report.ReportDate
-            };
-
-            return Ok(response);
+            return Ok(result.Report);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Administrator,Teacher")]
         public async Task<IActionResult> Delete(int id)
         {
-            var report = await _context.DailyReports.FindAsync(id);
+            var result = await _dailyReportService.DeleteAsync(
+                id,
+                GetCurrentUserId(),
+                GetCurrentUserRole());
 
-            if (report == null)
-                return NotFound("Dnevni izveštaj nije pronađen.");
-
-            _context.DailyReports.Remove(report);
-            await _context.SaveChangesAsync();
+            if (!result.Success)
+                return BadRequest(result.Error);
 
             return NoContent();
         }
@@ -187,6 +118,16 @@ namespace SmartKindergarten.Api.Controllers
                 throw new InvalidOperationException("User ID nije pronađen u tokenu.");
 
             return int.Parse(userId);
+        }
+
+        private string GetCurrentUserRole()
+        {
+            string? role = User.FindFirstValue(ClaimTypes.Role);
+
+            if (string.IsNullOrWhiteSpace(role))
+                throw new InvalidOperationException("Korisnička uloga nije pronađena u tokenu.");
+
+            return role;
         }
     }
 }
