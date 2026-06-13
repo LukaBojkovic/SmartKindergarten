@@ -5,6 +5,7 @@ import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import TemporaryPage from "./pages/TemporaryPage";
 import UsersPage from "./pages/UsersPage";
+import ChildrenPage from "./pages/ChildrenPage";
 
 function App() {
   return (
@@ -42,11 +43,10 @@ function App() {
               allowedRoles={[
                 "Administrator",
                 "Teacher",
-                "Parent",
                 "AdministrativeStaff",
               ]}
             >
-              <TemporaryPage
+              <ChildrenPage
                 title="Deca"
                 description="Pregled i upravljanje podacima o deci."
               />
