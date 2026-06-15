@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import TemporaryPage from "./pages/TemporaryPage";
 import UsersPage from "./pages/UsersPage";
 import ChildrenPage from "./pages/ChildrenPage";
+import GroupsPage from "./pages/GroupsPage";
 
 function App() {
   return (
@@ -58,7 +59,7 @@ function App() {
           path="/groups"
           element={
             <ProtectedRoute allowedRoles={["Administrator", "Teacher"]}>
-              <TemporaryPage
+              <GroupsPage
                 title="Grupe"
                 description="Pregled i upravljanje vrtićkim grupama."
               />
