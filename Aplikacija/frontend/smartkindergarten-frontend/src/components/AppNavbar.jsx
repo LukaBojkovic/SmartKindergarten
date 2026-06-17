@@ -54,6 +54,11 @@ function AppNavbar() {
                     Podešavanja
                   </Link>
                 </li>
+                <li className="nav-item">
+                   <Link className="nav-link" to="/attendance">
+                   Prisustvo
+                   </Link>
+                </li>
               </>
             )}
 
@@ -118,6 +123,11 @@ function AppNavbar() {
                   <Link className="nav-link" to="/children">
                     Deca
                   </Link>
+                </li>
+                <li className="nav-item">
+                   <Link className="nav-link" to="/attendance">
+                    Prisustvo
+                    </Link>
                 </li>
                 <li className="nav-item">
                   <Link className="nav-link" to="/finance">
