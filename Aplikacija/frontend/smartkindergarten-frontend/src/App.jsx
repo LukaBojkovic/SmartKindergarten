@@ -7,6 +7,7 @@ import TemporaryPage from "./pages/TemporaryPage";
 import UsersPage from "./pages/UsersPage";
 import ChildrenPage from "./pages/ChildrenPage";
 import GroupsPage from "./pages/GroupsPage";
+import AttendancePage from "./pages/AttendancePage";
 
 function App() {
   return (
@@ -83,7 +84,7 @@ function App() {
           path="/attendance"
           element={
             <ProtectedRoute allowedRoles={["Teacher"]}>
-              <TemporaryPage
+              <AttendancePage
                 title="Prisustvo"
                 description="Evidencija prisustva dece po grupi i datumu."
               />
