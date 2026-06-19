@@ -39,6 +39,15 @@ const childrenApi = {
   deactivate: async (id) => {
     await axiosClient.delete(`/children/${id}`);
   },
+
+  assignParent: async (childId, parentId) => {
+  await axiosClient.post(`/children/${childId}/parents/${parentId}`);
+  },
+
+removeParent: async (childId, parentId) => {
+  await axiosClient.delete(`/children/${childId}/parents/${parentId}`);
+  },
+  
 };
 
 export default childrenApi;

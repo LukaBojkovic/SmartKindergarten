@@ -54,11 +54,15 @@ function AppNavbar() {
                     Podešavanja
                   </Link>
                 </li>
+<<<<<<< HEAD
                 <li className="nav-item">
                    <Link className="nav-link" to="/attendance">
                    Prisustvo
                    </Link>
                 </li>
+=======
+                
+>>>>>>> feature/developmentProfile-page
               </>
             )}
 

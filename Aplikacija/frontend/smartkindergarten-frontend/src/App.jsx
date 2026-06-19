@@ -7,7 +7,11 @@ import TemporaryPage from "./pages/TemporaryPage";
 import UsersPage from "./pages/UsersPage";
 import ChildrenPage from "./pages/ChildrenPage";
 import GroupsPage from "./pages/GroupsPage";
+<<<<<<< HEAD
 import AttendancePage from "./pages/AttendancePage";
+=======
+import DevelopmentProfilePage from "./pages/DevelopmentProfilePage";
+>>>>>>> feature/developmentProfile-page
 
 function App() {
   return (
@@ -72,7 +76,7 @@ function App() {
           path="/development-profile"
           element={
             <ProtectedRoute allowedRoles={["Teacher", "Parent"]}>
-              <TemporaryPage
+              <DevelopmentProfilePage
                 title="Razvojni profil deteta"
                 description="Beleške, procene i grafički prikaz napretka deteta."
               />
