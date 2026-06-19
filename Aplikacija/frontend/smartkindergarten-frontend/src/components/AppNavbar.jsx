@@ -54,15 +54,17 @@ function AppNavbar() {
                     Podešavanja
                   </Link>
                 </li>
-<<<<<<< HEAD
+
                 <li className="nav-item">
                    <Link className="nav-link" to="/attendance">
                    Prisustvo
                    </Link>
                 </li>
-=======
-                
->>>>>>> feature/developmentProfile-page
+                <li className="nav-item">
+                   <Link className="nav-link" to="/daily-reports">
+                   Dnevni izveštaji
+                   </Link>
+                </li>
               </>
             )}
 
@@ -137,6 +139,11 @@ function AppNavbar() {
                   <Link className="nav-link" to="/finance">
                     Finansije
                   </Link>
+                </li>
+                <li className="nav-item">
+                   <Link className="nav-link" to="/daily-reports">
+                   Dnevni izveštaji
+                    </Link>     
                 </li>
               </>
             )}
