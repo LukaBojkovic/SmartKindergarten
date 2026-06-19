@@ -13,6 +13,7 @@ builder.Services.AddControllers();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<SystemSettingsService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<DailyReportService>();
 builder.Services.AddSwaggerGen(options =>
