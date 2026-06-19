@@ -6,6 +6,8 @@ import ChildForm from "../components/children/ChildForm";
 import ChildrenFilters from "../components/children/ChildrenFilters";
 import ChildrenTable from "../components/children/ChildrenTable";
 import { useAuth } from "../hooks/useAuth";
+import usersApi from "../api/usersApi";
+import ChildParentsManager from "../components/children/ChildParentsManager";
 
 const initialCreateForm = {
   firstName: "",
@@ -44,6 +46,11 @@ function ChildrenPage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  const [parents, setParents] = useState([]);
+  const [selectedChildForParents, setSelectedChildForParents] = useState(null);
+  const [selectedParentOption, setSelectedParentOption] = useState(null);
+  const [isParentSaving, setIsParentSaving] = useState(false);
+
   const canManage = user?.role === "Administrator";
 
   useEffect(() => {
@@ -74,6 +81,31 @@ function ChildrenPage() {
     };
   }, []);
 
+
+  useEffect(() => {
+  if (!canManage)
+    return;
+
+  let isCancelled = false;
+
+  usersApi
+    .getAll({ role: "Parent", isActive: "true" })
+    .then((data) => {
+      if (!isCancelled) {
+        setParents(data);
+      }
+    })
+    .catch((requestError) => {
+      if (!isCancelled) {
+        setError(getErrorMessage(requestError));
+      }
+    });
+
+  return () => {
+    isCancelled = true;
+    };
+  }, [canManage]);  
+
   useEffect(() => {
     let isCancelled = false;
 
@@ -90,6 +122,16 @@ function ChildrenPage() {
         {
           setChildrenList(data);
           setError("");
+
+          setSelectedChildForParents((previousSelectedChild) => {
+          if (!previousSelectedChild)
+              return null;
+
+          const updatedChild = data
+          .find((child) => child.id === previousSelectedChild.id);
+
+          return updatedChild || null;
+          });
         }
       })
       .catch((requestError) => {
@@ -119,6 +161,16 @@ function ChildrenPage() {
       });
 
       setChildrenList(data);
+
+      setSelectedChildForParents((previousSelectedChild) => {
+      if (!previousSelectedChild)
+         return null;
+
+      const updatedChild = data
+      .find((child) => child.id === previousSelectedChild.id);
+
+  return updatedChild || null;
+});
     } 
     catch (requestError) 
     {
@@ -258,6 +310,89 @@ function ChildrenPage() {
     }
   };
 
+  const handleManageParents = (child) => {
+  setSelectedChildForParents(child);
+  setSelectedParentOption(null);
+  setError("");
+  setSuccessMessage("");
+};
+
+const handleAssignParent = async () => {
+  if (!selectedChildForParents || !selectedParentOption)
+    return;
+
+  setIsParentSaving(true);
+  setError("");
+  setSuccessMessage("");
+
+  try 
+  {
+    await childrenApi
+    .assignParent(selectedChildForParents.id,
+      selectedParentOption.value);
+
+    setSelectedParentOption(null);
+    setSuccessMessage("Roditelj je uspešno povezan sa detetom.");
+
+    await loadChildren();
+  } 
+  catch (requestError) 
+  {
+    setError(getErrorMessage(requestError));
+  } 
+  finally 
+  {
+    setIsParentSaving(false);
+  }
+};
+
+const handleRemoveParent = async (parent) => {
+  if (!selectedChildForParents)
+    return;
+
+  const parentId = parent.id ?? parent.parentId;
+
+  const confirmed = window.confirm(
+    `Da li sigurno želiš da ukloniš roditelja ${parent.fullName} za ovo dete?`
+  );
+
+  if (!confirmed)
+    return;
+
+  setIsParentSaving(true);
+  setError("");
+  setSuccessMessage("");
+
+  try 
+  {
+    await childrenApi.removeParent(selectedChildForParents.id, parentId);
+
+    setSuccessMessage("Roditelj je uklonjen sa deteta.");
+
+    await loadChildren();
+  } 
+  catch (requestError) 
+  {
+    setError(getErrorMessage(requestError));
+  } 
+  finally 
+  {
+    setIsParentSaving(false);
+  }
+};
+
+const assignedParentIds =
+  selectedChildForParents?.parents?.map(
+    (parent) => parent.id ?? parent.parentId
+  ) ?? [];
+
+const parentOptions = parents
+  .filter((parent) => !assignedParentIds.includes(parent.id))
+  .map((parent) => ({
+    value: parent.id,
+    label: `${parent.firstName} ${parent.lastName} - ${parent.email}`,
+  }));
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -318,11 +453,25 @@ function ChildrenPage() {
                 childrenList={childrenList}
                 isLoading={isLoading}
                 canManage={canManage}
+                selectedChildId={selectedChildForParents?.id}
                 onEdit={startEdit}
                 onDeactivate={handleDeactivate}
+                onManageParents={handleManageParents}
               />
             </div>
           </div>
+
+            {canManage && (
+              <ChildParentsManager
+                selectedChild={selectedChildForParents}
+                parentOptions={parentOptions}
+                selectedParentOption={selectedParentOption}
+                isSaving={isParentSaving}
+                onParentOptionChange={setSelectedParentOption}
+                onAssignParent={handleAssignParent}
+                onRemoveParent={handleRemoveParent}
+              />
+            )}
         </div>
       </div>
     </div>

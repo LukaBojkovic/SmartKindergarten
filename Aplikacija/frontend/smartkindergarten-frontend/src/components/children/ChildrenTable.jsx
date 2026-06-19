@@ -1,4 +1,12 @@
-function ChildrenTable({ childrenList, isLoading, canManage, onEdit, onDeactivate }) 
+function ChildrenTable({
+   childrenList,
+   isLoading,
+   canManage,
+   selectedChildId,
+   onEdit, 
+   onDeactivate,
+   onManageParents,
+  }) 
 {
   if (isLoading) 
     return <div className="alert alert-info">Učitavanje dece...</div>;
@@ -30,7 +38,10 @@ function ChildrenTable({ childrenList, isLoading, canManage, onEdit, onDeactivat
           )}
 
           {childrenList.map((child) => (
-            <tr key={child.id}>
+            <tr 
+            key={child.id}
+            className={selectedChildId === child.id ? "table-primary" : ""}
+            >
               <td>
                 {child.firstName} {child.lastName}
               </td>
@@ -55,6 +66,13 @@ function ChildrenTable({ childrenList, isLoading, canManage, onEdit, onDeactivat
 
               {canManage && (
                 <td className="text-end">
+                  <button
+                    className="btn btn-sm btn-outline-info me-2"
+                    onClick={() => onManageParents(child)}
+                  >
+                    Roditelji
+                  </button>
+
                   <button
                     className="btn btn-sm btn-outline-primary me-2"
                     onClick={() => onEdit(child)}
