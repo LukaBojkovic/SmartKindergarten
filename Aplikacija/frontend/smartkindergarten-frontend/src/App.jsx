@@ -10,6 +10,7 @@ import GroupsPage from "./pages/GroupsPage";
 import AttendancePage from "./pages/AttendancePage";
 import DevelopmentProfilePage from "./pages/DevelopmentProfilePage";
 import DailyReportsPage from "./pages/DailyReportsPage";
+import NotificationsPage from "./pages/NotificationsPage";
 
 function App() {
   return (
@@ -110,7 +111,7 @@ function App() {
           path="/notifications"
           element={
             <ProtectedRoute allowedRoles={["Teacher", "Parent", "Administrator"]}>
-              <TemporaryPage
+              <NotificationsPage
                 title="Obaveštenja"
                 description="Pregled i slanje obaveštenja."
               />

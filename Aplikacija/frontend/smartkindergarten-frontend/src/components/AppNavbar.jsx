@@ -65,6 +65,11 @@ function AppNavbar() {
                    Dnevni izveštaji
                    </Link>
                 </li>
+                <li className="nav-item">
+                   <Link className="nav-link" to="/notifications">
+                   Obaveštenja
+                   </Link>
+                </li>
               </>
             )}
 
@@ -94,6 +99,11 @@ function AppNavbar() {
                   <Link className="nav-link" to="/daily-reports">
                     Dnevni izveštaji
                   </Link>
+                </li>
+                <li className="nav-item">
+                   <Link className="nav-link" to="/notifications">
+                   Obaveštenja
+                   </Link>
                 </li>
               </>
             )}
@@ -144,6 +154,11 @@ function AppNavbar() {
                    <Link className="nav-link" to="/daily-reports">
                    Dnevni izveštaji
                     </Link>     
+                </li>
+                <li className="nav-item">
+                   <Link className="nav-link" to="/notifications">
+                   Obaveštenja
+                   </Link>
                 </li>
               </>
             )}
