@@ -11,6 +11,7 @@ import AttendancePage from "./pages/AttendancePage";
 import DevelopmentProfilePage from "./pages/DevelopmentProfilePage";
 import DailyReportsPage from "./pages/DailyReportsPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import FinancePage from "./pages/FinancePage";
 
 function App() {
   return (
@@ -123,7 +124,7 @@ function App() {
           path="/finance"
           element={
             <ProtectedRoute allowedRoles={["Parent", "AdministrativeStaff", "Administrator"]}>
-              <TemporaryPage
+              <FinancePage
                 title="Finansije"
                 description="Pregled uplata i finansijskog statusa deteta."
               />
