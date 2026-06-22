@@ -87,7 +87,7 @@ function NotificationsPage() {
 
     const request =
       user?.role === "Administrator"
-        ? loadAdminRecipientOptions()
+        ? loadAdminRecipientOptions(currentUserId)
         : loadParentRecipientOptions();
 
     request
@@ -275,6 +275,13 @@ function NotificationsPage() {
     ? "Pregled primljenih obaveštenja i slanje novih obaveštenja korisnicima."
     : "Pregled obaveštenja koja su vam poslata.";
 
+    const selectAllRecipients = () => {
+    setSelectedRecipients(recipientOptions);
+  };
+
+  const clearRecipients = () => {
+    setSelectedRecipients([]);
+  };
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -312,6 +319,8 @@ function NotificationsPage() {
             isSaving={isSaving}
             onChange={handleFormChange}
             onRecipientsChange={setSelectedRecipients}
+            onSelectAllRecipients={selectAllRecipients}
+            onClearRecipients={clearRecipients}
             onSubmit={handleSubmit}
             onCancelEdit={cancelEdit}
           />
@@ -342,13 +351,14 @@ function NotificationsPage() {
   );
 }
 
-async function loadAdminRecipientOptions() {
+async function loadAdminRecipientOptions(currentUserId) {
   const users = await usersApi.getAll({
     role: "",
     isActive: "true",
   });
 
   return users
+    .filter((user) => Number(user.id) !== Number(currentUserId))
     .map((user) => ({
       value: user.id,
       label: `${user.firstName} ${user.lastName} - ${user.role}`,

@@ -9,6 +9,8 @@ function NotificationForm({
   isSaving,
   onChange,
   onRecipientsChange,
+  onSelectAllRecipients,
+  onClearRecipients,
   onSubmit,
   onCancelEdit,
 }) {
@@ -55,6 +57,27 @@ function NotificationForm({
               isMulti
               isDisabled={Boolean(editingNotificationId)}
             />
+          {!editingNotificationId && (
+          <div className="d-flex gap-2 mt-2">
+            <button
+              type="button"
+              className="btn btn-outline-primary btn-sm"
+              onClick={onSelectAllRecipients}
+              disabled={recipientOptions.length === 0}
+            >
+              Izaberi sve dostupne primaoce
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={onClearRecipients}
+              disabled={selectedRecipients.length === 0}
+            >
+              Poništi izbor
+            </button>
+          </div>
+            )}
 
             {editingNotificationId && (
               <div className="form-text">
