@@ -1,6 +1,10 @@
-function FinanceStatusCard({ status, isLoading }) {
+function FinanceStatusCard({ status, isLoading, monthlyFee, numberOfMonths }) {
   if (isLoading) {
-    return <div className="alert alert-info">Učitavanje finansijskog statusa...</div>;
+    return (
+      <div className="alert alert-info">
+        Učitavanje finansijskog statusa...
+      </div>
+    );
   }
 
   if (!status) {
@@ -29,6 +33,13 @@ function FinanceStatusCard({ status, isLoading }) {
           )}
         </div>
 
+        {monthlyFee && numberOfMonths && status.expectedAmount !== null && (
+          <div className="alert alert-secondary">
+            Obračun: {numberOfMonths} mesec/i × {formatCurrency(monthlyFee)} ={" "}
+            <strong>{formatCurrency(status.expectedAmount)}</strong>
+          </div>
+        )}
+
         <div className="row g-3">
           <div className="col-md-3">
             <div className="border rounded p-3 h-100">
@@ -41,7 +52,7 @@ function FinanceStatusCard({ status, isLoading }) {
 
           <div className="col-md-3">
             <div className="border rounded p-3 h-100">
-              <div className="text-muted small">Očekivani iznos</div>
+              <div className="text-muted small">Očekivana obaveza</div>
               <div className="fs-5 fw-semibold">
                 {status.expectedAmount !== null &&
                 status.expectedAmount !== undefined
@@ -53,11 +64,9 @@ function FinanceStatusCard({ status, isLoading }) {
 
           <div className="col-md-3">
             <div className="border rounded p-3 h-100">
-              <div className="text-muted small">Stanje</div>
+              <div className="text-muted small">Dugovanje / pretplata</div>
               <div className="fs-5 fw-semibold">
-                {status.balance !== null && status.balance !== undefined
-                  ? formatCurrency(status.balance)
-                  : "-"}
+                {formatBalance(status.balance)}
               </div>
             </div>
           </div>
@@ -105,6 +114,22 @@ function getBalanceStatus(balance) {
     text: "Izmireno",
     className: "bg-success",
   };
+}
+
+function formatBalance(balance) {
+  if (balance === null || balance === undefined) {
+    return "-";
+  }
+
+  if (balance > 0) {
+    return `Dugovanje: ${formatCurrency(balance)}`;
+  }
+
+  if (balance < 0) {
+    return `Pretplata: ${formatCurrency(Math.abs(balance))}`;
+  }
+
+  return "Izmireno";
 }
 
 function formatCurrency(value) {

@@ -1,9 +1,40 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useEffect, useState } from "react";
+import systemSettingsApi from "../api/systemSettingsApi";
 
 function AppNavbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+
+  const [kindergartenName, setKindergartenName] =
+    useState("SmartKindergarten");
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      setKindergartenName("SmartKindergarten");
+      return;
+    }
+
+    let isCancelled = false;
+
+    systemSettingsApi
+      .getByKey("KindergartenName")
+      .then((setting) => {
+        if (!isCancelled && setting.value) {
+          setKindergartenName(setting.value);
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setKindergartenName("SmartKindergarten");
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isAuthenticated, user?.id, user?.role]);
 
   const handleLogout = () => {
     logout();
@@ -18,7 +49,7 @@ function AppNavbar() {
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/dashboard">
-          SmartKindergarten
+          {kindergartenName}
         </Link>
 
         <button
@@ -163,6 +194,11 @@ function AppNavbar() {
                    <Link className="nav-link" to="/notifications">
                    Obaveštenja
                    </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/system-settings">
+                    Podešavanja
+                  </Link>
                 </li>
               </>
             )}
