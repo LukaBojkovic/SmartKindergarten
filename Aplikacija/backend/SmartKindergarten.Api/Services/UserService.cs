@@ -132,6 +132,25 @@ namespace SmartKindergarten.Api.Services
             return (true, null, ToDto(user));
         }
 
+        public async Task<(bool Success, string? Error)> ResetPasswordAsync(int id, ResetPasswordRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.NewPassword))
+                return (false, "Nova lozinka je obavezna.");
+
+            if (request.NewPassword.Length < 6)
+                return (false, "Nova lozinka mora imati najmanje 6 karaktera.");
+
+            User? user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+                return (false, "Korisnik nije pronađen.");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+            await _context.SaveChangesAsync();
+
+            return (true, null);
+        }
         public async Task<bool> DeactivateAsync(int id)
         {
             User? user = await _context.Users.FindAsync(id);

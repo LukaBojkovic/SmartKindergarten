@@ -52,5 +52,22 @@ namespace SmartKindergarten.Api.Controllers
                 FullName = fullName
             });
         }
+
+        [HttpPut("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto request)
+        {
+            string? userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdValue, out int userId))
+                return Unauthorized("Korisnik nije ispravno autentifikovan.");
+
+            var result = await _authService.ChangePasswordAsync(userId, request);
+
+            if (!result.Success)
+                return BadRequest(result.Error);
+
+            return Ok("Lozinka je uspešno promenjena.");
+        }
     }
 }

@@ -15,6 +15,15 @@ const authApi = {
 
     return response.data;
   },
+
+  changePassword: async (passwordData) => {
+  const response = await axiosClient.put(
+    "/auth/change-password",
+    passwordData
+  );
+
+  return response.data;
+  },
 };
 
 export default authApi;

@@ -42,6 +42,36 @@ namespace SmartKindergarten.Api.Services
             };
         }
 
+        public async Task<(bool Success, string? Error)> ChangePasswordAsync(int userId, ChangePasswordRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.CurrentPassword) || string.IsNullOrWhiteSpace(request.NewPassword))
+                return (false, "Trenutna i nova lozinka su obavezne.");
+
+            if (request.NewPassword.Length < 6)
+                return (false, "Nova lozinka mora imati najmanje 6 karaktera.");
+
+            User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && u.IsActive);
+
+            if (user == null)
+                return (false, "Korisnik nije pronađen.");
+
+            bool currentPasswordIsValid = BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash);
+
+            if (!currentPasswordIsValid)
+                return (false, "Trenutna lozinka nije ispravna.");
+
+            bool newPasswordIsSame = BCrypt.Net.BCrypt.Verify(request.NewPassword, user.PasswordHash);
+
+            if (newPasswordIsSame)
+                return (false, "Nova lozinka mora biti različita od trenutne.");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+            await _context.SaveChangesAsync();
+
+            return (true, null);
+        }
+
         private string GenerateJwtToken(User user)
         {
             string? jwtKey = _configuration["Jwt:Key"];

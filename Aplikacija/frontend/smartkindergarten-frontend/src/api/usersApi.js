@@ -37,6 +37,14 @@ const usersApi =
   deactivate: async (id) => {
     await axiosClient.delete(`/users/${id}`);
   },
+
+  resetPassword: async (id, newPassword) => {
+  const response = await axiosClient.put(`/users/${id}/reset-password`, {
+    newPassword,
+  });
+
+  return response.data;
+  },
 };
 
 export default usersApi;

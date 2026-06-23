@@ -3,7 +3,6 @@ import AppNavbar from "./components/AppNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
-import TemporaryPage from "./pages/TemporaryPage";
 import UsersPage from "./pages/UsersPage";
 import ChildrenPage from "./pages/ChildrenPage";
 import GroupsPage from "./pages/GroupsPage";
@@ -13,6 +12,7 @@ import DailyReportsPage from "./pages/DailyReportsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import FinancePage from "./pages/FinancePage";
 import SystemSettingsPage from "./pages/SystemSettingsPage";
+import AccountPage from "./pages/AccountPage";
 
 function App() {
   return (
@@ -31,6 +31,20 @@ function App() {
           }
         />
 
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Administrator",
+                "Teacher",
+                "Parent",
+                "AdministrativeStaff",]}>
+              <AccountPage />
+            </ProtectedRoute>
+          }
+        />
+        
         <Route
           path="/users"
           element={
