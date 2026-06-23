@@ -1,17 +1,22 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import systemSettingsApi from "../api/systemSettingsApi";
 
-function AppNavbar() {
+function AppNavbar() 
+{
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   const [kindergartenName, setKindergartenName] =
     useState("SmartKindergarten");
 
+  const userId = user?.id ?? user?.userId;
+
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !userId) 
+    {
       setKindergartenName("SmartKindergarten");
       return;
     }
@@ -34,16 +39,15 @@ function AppNavbar() {
     return () => {
       isCancelled = true;
     };
-  }, [isAuthenticated, user?.id, user?.role]);
+  }, [isAuthenticated, userId]);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated)
     return null;
-  }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -208,6 +212,10 @@ function AppNavbar() {
             <span>
               {user?.fullName} ({user?.role})
             </span>
+
+            <Link className="btn btn-outline-light btn-sm" to="/account">
+              Moj nalog
+            </Link>
 
             <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
               Odjava

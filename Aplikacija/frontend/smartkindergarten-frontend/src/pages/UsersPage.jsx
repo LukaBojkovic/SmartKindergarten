@@ -4,6 +4,7 @@ import usersApi from "../api/usersApi";
 import UserForm from "../components/users/UserForm";
 import UsersFilters from "../components/users/UsersFilters";
 import UsersTables from "../components/users/UsersTables";
+import ResetPasswordForm from "../components/users/ResetPasswordForm";
 
 const USER_ROLES = [
   "Administrator",
@@ -29,6 +30,11 @@ const initialEditForm = {
   isActive: true,
 };
 
+const initialResetPasswordForm = {
+  newPassword: "",
+  confirmPassword: "",
+};
+
 function UsersPage()
  {
   const [users, setUsers] = useState([]);
@@ -43,6 +49,12 @@ function UsersPage()
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  const [resetPasswordUser, setResetPasswordUser] = useState(null);
+  const [resetPasswordForm, setResetPasswordForm] = 
+    useState(initialResetPasswordForm);
+
+  const [isResetPasswordSaving, setIsResetPasswordSaving] = useState(false);
 
   useEffect(() => {
     let isCancelled = false;
@@ -217,6 +229,75 @@ function UsersPage()
     }
   };
 
+  const startResetPassword = (user) => {
+  setResetPasswordUser(user);
+  setResetPasswordForm(initialResetPasswordForm);
+  setError("");
+  setSuccessMessage("");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const cancelResetPassword = () => {
+  setResetPasswordUser(null);
+  setResetPasswordForm(initialResetPasswordForm);
+};
+
+const handleResetPasswordChange = (event) => {
+  const { name, value } = event.target;
+
+  setResetPasswordForm((previousForm) => ({
+    ...previousForm,
+    [name]: value,
+  }));
+};
+
+const handleResetPasswordSubmit = async (event) => {
+  event.preventDefault();
+
+  if (!resetPasswordUser)
+    return;
+
+  if (resetPasswordForm.newPassword !== resetPasswordForm.confirmPassword)
+  {
+    setError("Nova lozinka i potvrda lozinke se ne poklapaju.");
+    setSuccessMessage("");
+    return;
+  }
+
+  if (resetPasswordForm.newPassword.length < 6) 
+  {
+    setError("Nova lozinka mora imati najmanje 6 karaktera.");
+    setSuccessMessage("");
+    return;
+  }
+
+  setIsResetPasswordSaving(true);
+  setError("");
+  setSuccessMessage("");
+
+  try 
+  {
+    await usersApi
+    .resetPassword(resetPasswordUser.id, resetPasswordForm.newPassword);
+
+    setSuccessMessage(
+      `Lozinka za korisnika ${resetPasswordUser.username} je uspešno resetovana.`
+    );
+
+    setResetPasswordUser(null);
+    setResetPasswordForm(initialResetPasswordForm);
+  } 
+  catch (requestError) 
+  {
+    setError(getErrorMessage(requestError));
+  } 
+  finally 
+  {
+    setIsResetPasswordSaving(false);
+  }
+};
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -254,6 +335,15 @@ function UsersPage()
           />
         </div>
 
+          <ResetPasswordForm
+            selectedUser={resetPasswordUser}
+            form={resetPasswordForm}
+            isSaving={isResetPasswordSaving}
+            onChange={handleResetPasswordChange}
+            onSubmit={handleResetPasswordSubmit}
+            onCancel={cancelResetPassword}
+          />
+
         <div className="col-lg-8">
           <div className="card shadow-sm">
             <div className="card-body">
@@ -270,6 +360,7 @@ function UsersPage()
                 isLoading={isLoading}
                 onEdit={startEdit}
                 onDeactivate={handleDeactivate}
+                onResetPassword={startResetPassword}
               />
             </div>
           </div>

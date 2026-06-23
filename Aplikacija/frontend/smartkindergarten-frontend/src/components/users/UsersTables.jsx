@@ -1,4 +1,10 @@
-function UsersTables({ users, isLoading, onEdit, onDeactivate })
+function UsersTables({ 
+  users, 
+  isLoading, 
+  onEdit, 
+  onDeactivate,
+  onResetPassword,
+ })
  {
   if (isLoading)
     return <div className="alert alert-info">Učitavanje korisnika...</div>;
@@ -48,6 +54,13 @@ function UsersTables({ users, isLoading, onEdit, onDeactivate })
                 >
                   Izmeni
                 </button>
+
+                <button
+                  className="btn btn-sm btn-outline-warning me-2"
+                  onClick={() => onResetPassword(user)}
+                >
+                  Reset lozinke
+              </button>
 
                 {user.isActive && (
                   <button

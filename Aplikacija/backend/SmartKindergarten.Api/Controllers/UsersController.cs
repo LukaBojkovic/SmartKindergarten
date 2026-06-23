@@ -82,6 +82,22 @@ namespace SmartKindergarten.Api.Controllers
             return Ok(result.User);
         }
 
+        [HttpPut("{id}/reset-password")]
+        public async Task<IActionResult> ResetPassword(int id, ResetPasswordRequestDto request)
+        {
+            var result = await _userService.ResetPasswordAsync(id, request);
+
+            if (!result.Success)
+            {
+                if (result.Error == "Korisnik nije pronađen.")
+                    return NotFound(result.Error);
+
+                return BadRequest(result.Error);
+            }
+
+            return Ok("Lozinka korisnika je uspešno resetovana.");
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Deactivate(int id)
         {

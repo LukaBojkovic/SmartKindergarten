@@ -4,11 +4,11 @@ import { useAuth } from "../hooks/useAuth";
 function ProtectedRoute({ children, allowedRoles }) {
   const { isAuthenticated, user } = useAuth();
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user)
     return <Navigate to="/login" replace />;
-  }
 
-  if (allowedRoles && !allowedRoles.includes(user?.role)) {
+  if (allowedRoles && !allowedRoles.includes(user?.role))
+  {
     return (
       <div className="container mt-5">
         <div className="alert alert-danger">
