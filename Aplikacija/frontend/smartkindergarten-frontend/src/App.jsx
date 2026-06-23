@@ -12,6 +12,7 @@ import DevelopmentProfilePage from "./pages/DevelopmentProfilePage";
 import DailyReportsPage from "./pages/DailyReportsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import FinancePage from "./pages/FinancePage";
+import SystemSettingsPage from "./pages/SystemSettingsPage";
 
 function App() {
   return (
@@ -136,7 +137,7 @@ function App() {
           path="/system-settings"
           element={
             <ProtectedRoute allowedRoles={["Administrator"]}>
-              <TemporaryPage
+              <SystemSettingsPage
                 title="Sistemska podešavanja"
                 description="Pregled i izmena osnovnih podešavanja aplikacije."
               />

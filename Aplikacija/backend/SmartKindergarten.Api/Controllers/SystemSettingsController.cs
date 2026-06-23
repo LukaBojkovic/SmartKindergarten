@@ -39,9 +39,14 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("key/{key}")]
-        [Authorize(Roles = "Administrator,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator,AdministrativeStaff,Parent,Teacher")]
         public async Task<ActionResult<SystemSettingResponseDto>> GetByKey(string key)
         {
+            bool isLimitedUser = User.IsInRole("Parent") || User.IsInRole("Teacher");
+
+            if (isLimitedUser && key != "MonthlyFee" && key != "KindergartenName")
+                return Forbid();
+
             var setting = await _systemSettingsService.GetByKeyAsync(key);
 
             if (setting == null)

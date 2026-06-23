@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import childrenApi from "../api/childrenApi";
 import paymentsApi from "../api/paymentsApi";
+import systemSettingsApi from "../api/systemSettingsApi";
 import FinanceFilters from "../components/finance/FinanceFilters";
 import FinanceStatusCard from "../components/finance/FinanceStatusCard";
 import PaymentForm from "../components/finance/PaymentForm";
@@ -14,6 +15,8 @@ const initialForm = {
   description: "",
 };
 
+const MONTHLY_FEE_KEY = "MonthlyFee";
+
 function FinancePage() {
   const { user } = useAuth();
 
@@ -23,13 +26,15 @@ function FinancePage() {
   const [payments, setPayments] = useState([]);
   const [financeStatus, setFinanceStatus] = useState(null);
 
-  const [expectedAmount, setExpectedAmount] = useState("");
+  const [monthlyFee, setMonthlyFee] = useState("");
+  const [numberOfMonths, setNumberOfMonths] = useState("1");
   const [searchFilter, setSearchFilter] = useState("");
 
   const [form, setForm] = useState(initialForm);
   const [editingPaymentId, setEditingPaymentId] = useState(null);
 
   const [isLoadingChildren, setIsLoadingChildren] = useState(true);
+  const [isLoadingMonthlyFee, setIsLoadingMonthlyFee] = useState(true);
   const [isLoadingFinance, setIsLoadingFinance] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -40,6 +45,68 @@ function FinancePage() {
     user?.role === "Administrator" || user?.role === "AdministrativeStaff";
 
   const selectedChildId = selectedChildOption?.value;
+
+  const expectedAmount = useMemo(() => {
+    const parsedMonthlyFee = Number(monthlyFee);
+    const parsedNumberOfMonths = Number(numberOfMonths);
+
+    if (
+      Number.isNaN(parsedMonthlyFee) ||
+      Number.isNaN(parsedNumberOfMonths) ||
+      parsedMonthlyFee <= 0 ||
+      parsedNumberOfMonths <= 0
+    ) {
+      return "";
+    }
+
+    return parsedMonthlyFee * parsedNumberOfMonths;
+  }, [monthlyFee, numberOfMonths]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    setIsLoadingMonthlyFee(true);
+
+    systemSettingsApi
+      .getByKey(MONTHLY_FEE_KEY)
+      .then((setting) => {
+        if (isCancelled) {
+          return;
+        }
+
+        const parsedValue = Number(setting.value);
+
+        if (Number.isNaN(parsedValue) || parsedValue <= 0) {
+          setMonthlyFee("");
+          setError("Mesečna članarina nije ispravno podešena.");
+          return;
+        }
+
+        setMonthlyFee(parsedValue);
+      })
+      .catch((requestError) => {
+        if (!isCancelled) {
+          setMonthlyFee("");
+
+          if (requestError.response?.status === 404) {
+            setError(
+              "Mesečna članarina nije podešena. Administrator treba da je podesi na stranici Sistemska podešavanja."
+            );
+          } else {
+            setError(getErrorMessage(requestError));
+          }
+        }
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsLoadingMonthlyFee(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let isCancelled = false;
@@ -101,6 +168,7 @@ function FinancePage() {
     };
   }, []);
 
+  // Učitava uplate i finansijski status za izabrano dete.
   useEffect(() => {
     if (!selectedChildId) {
       setPayments([]);
@@ -114,16 +182,12 @@ function FinancePage() {
 
     Promise.all([
       paymentsApi.getByChild(selectedChildId),
-      paymentsApi.getChildStatus(
-        selectedChildId,
-        expectedAmount ? Number(expectedAmount) : ""
-      ),
+      paymentsApi.getChildStatus(selectedChildId, expectedAmount),
     ])
       .then(([paymentsData, statusData]) => {
         if (!isCancelled) {
           setPayments(paymentsData);
           setFinanceStatus(statusData);
-          setError("");
         }
       })
       .catch((requestError) => {
@@ -174,10 +238,7 @@ function FinancePage() {
     try {
       const [paymentsData, statusData] = await Promise.all([
         paymentsApi.getByChild(selectedChildId),
-        paymentsApi.getChildStatus(
-          selectedChildId,
-          expectedAmount ? Number(expectedAmount) : ""
-        ),
+        paymentsApi.getChildStatus(selectedChildId, expectedAmount),
       ]);
 
       setPayments(paymentsData);
@@ -281,7 +342,7 @@ function FinancePage() {
 
   const clearFilters = () => {
     setSearchFilter("");
-    setExpectedAmount("");
+    setNumberOfMonths("1");
   };
 
   const resetForm = () => {
@@ -322,11 +383,14 @@ function FinancePage() {
       <FinanceFilters
         childOptions={childOptions}
         selectedChildOption={selectedChildOption}
+        monthlyFee={monthlyFee}
+        numberOfMonths={numberOfMonths}
         expectedAmount={expectedAmount}
         searchFilter={searchFilter}
         isLoadingChildren={isLoadingChildren}
+        isLoadingMonthlyFee={isLoadingMonthlyFee}
         onChildChange={setSelectedChildOption}
-        onExpectedAmountChange={setExpectedAmount}
+        onNumberOfMonthsChange={setNumberOfMonths}
         onSearchFilterChange={setSearchFilter}
         onClearFilters={clearFilters}
       />
@@ -340,6 +404,8 @@ function FinancePage() {
       <FinanceStatusCard
         status={financeStatus}
         isLoading={isLoadingFinance}
+        monthlyFee={monthlyFee}
+        numberOfMonths={numberOfMonths}
       />
 
       {canManage && (
@@ -393,6 +459,14 @@ function toUtcIsoDate(value) {
 }
 
 function getErrorMessage(error) {
+  if (error.response?.status === 401) {
+    return "Niste prijavljeni ili je sesija istekla. Prijavite se ponovo.";
+  }
+
+  if (error.response?.status === 403) {
+    return "Nemate dozvolu za ovu akciju.";
+  }
+
   if (typeof error.response?.data === "string") {
     return error.response.data;
   }
