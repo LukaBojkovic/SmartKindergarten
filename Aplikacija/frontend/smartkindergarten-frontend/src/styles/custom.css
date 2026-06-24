@@ -8,7 +8,8 @@
 }
 
 body {
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   background-color: var(--sk-bg);
   font-size: 0.95rem;
 }
@@ -29,7 +30,6 @@ h6,
 
 .navbar-brand {
   font-weight: 700;
-  letter-spacing: 0.2px;
 }
 
 .navbar .nav-link {
@@ -38,6 +38,42 @@ h6,
 
 .navbar .nav-link:hover {
   color: #fff6df !important;
+}
+
+.app-navbar .navbar-nav {
+  column-gap: 0.15rem;
+  row-gap: 0.25rem;
+}
+
+.app-navbar .nav-link {
+  white-space: nowrap;
+  padding-left: 0.55rem;
+  padding-right: 0.55rem;
+}
+
+.app-navbar .navbar-brand {
+  white-space: nowrap;
+  margin-right: 1.5rem;
+}
+
+.app-navbar .user-dropdown {
+  margin-left: 1rem;
+}
+
+.app-navbar .user-dropdown .dropdown-toggle {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn {
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.btn-sm {
+  border-radius: 8px;
 }
 
 .btn-primary {
@@ -84,6 +120,38 @@ h6,
   font-weight: 700;
 }
 
+.app-table th,
+.app-table td,
+.users-table th,
+.users-table td {
+  vertical-align: middle;
+}
+
+.app-table th,
+.users-table th {
+  white-space: nowrap;
+}
+
+.app-table td:last-child,
+.users-table td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.children-table td:nth-child(1),
+.groups-table td:nth-child(1) {
+  font-weight: 600;
+}
+
+.children-table td:nth-child(4),
+.groups-table td:nth-child(2) {
+  max-width: 320px;
+}
+
+.payments-table td:nth-child(4) {
+  max-width: 360px;
+}
+
 .badge.bg-success {
   background-color: #4f8f70 !important;
 }
@@ -107,6 +175,11 @@ h6,
   border-color: #dfe5e1;
 }
 
+.container,
+.container-fluid {
+  max-width: 1320px;
+}
+
 .page-header {
   margin-bottom: 1.5rem;
 }
@@ -120,7 +193,15 @@ h6,
   color: var(--sk-text-muted);
 }
 
+.page-actions,
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .form-label {
+  margin-bottom: 0.45rem;
   font-weight: 600;
   color: #365343;
 }
@@ -129,85 +210,6 @@ h6,
 .form-select:focus {
   border-color: var(--sk-primary);
   box-shadow: 0 0 0 0.2rem rgba(79, 143, 112, 0.18);
-}
-
-.btn {
-  border-radius: 10px;
-  font-weight: 500;
-}
-
-.btn-sm {
-  border-radius: 8px;
-}
-
-.container,
-.container-fluid {
-  max-width: 1320px;
-}
-
-.app-navbar .navbar-nav {
-  column-gap: 0.15rem;
-  row-gap: 0.25rem;
-}
-
-.app-navbar .nav-link {
-  white-space: nowrap;
-  padding-left: 0.55rem;
-  padding-right: 0.55rem;
-}
-
-.app-navbar .navbar-brand {
-  white-space: nowrap;
-  margin-right: 1.5rem;
-}
-
-.app-navbar .user-dropdown {
-  margin-left: 1rem;
-}
-
-.app-navbar .user-dropdown .dropdown-toggle {
-  max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.users-table th,
-.users-table td {
-  vertical-align: middle;
-}
-
-.users-table th {
-  white-space: nowrap;
-}
-
-.users-table td:last-child {
-  width: 1%;
-  white-space: nowrap;
-}
-
-.app-table th,
-.app-table td {
-  vertical-align: middle;
-}
-
-.app-table th {
-  white-space: nowrap;
-}
-
-.app-table td:last-child {
-  width: 1%;
-  white-space: nowrap;
-}
-
-.children-table td:nth-child(1),
-.groups-table td:nth-child(1) {
-  font-weight: 600;
-}
-
-.children-table td:nth-child(4),
-.groups-table td:nth-child(2) {
-  max-width: 320px;
 }
 
 .react-datepicker-wrapper {
@@ -222,26 +224,17 @@ h6,
   width: 100%;
 }
 
-.form-label {
-  margin-bottom: 0.45rem;
+.dropdown-menu {
+  border-radius: 12px;
+  border-color: var(--sk-card-border);
 }
 
-.app-table th,
-.app-table td {
-  vertical-align: middle;
+.dropdown-item {
+  font-weight: 500;
 }
 
-.app-table th {
-  white-space: nowrap;
-}
-
-.app-table td:last-child {
-  width: 1%;
-  white-space: nowrap;
-}
-
-.payments-table td:nth-child(4) {
-  max-width: 360px;
+.dropdown-item:active {
+  background-color: var(--sk-primary);
 }
 
 .development-chart-wrapper {
@@ -259,40 +252,66 @@ h6,
   padding: 0.55rem 0.75rem;
 }
 
-.app-table th,
-.app-table td {
-  vertical-align: middle;
+.daily-report-list-image-wrapper {
+  width: fit-content;
+  max-width: 100%;
 }
 
-.app-table th {
-  white-space: nowrap;
+.daily-report-image-button {
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+  text-align: left;
 }
 
-.app-table td:last-child {
-  width: 1%;
-  white-space: nowrap;
-}
-
-.payments-table td:nth-child(4) {
-  max-width: 360px;
-}
-
-.dropdown-menu {
+.daily-report-list-image {
+  display: block;
+  width: auto;
+  max-width: min(640px, 100%);
+  max-height: 420px;
+  object-fit: contain;
   border-radius: 12px;
-  border-color: var(--sk-card-border);
+  border: 1px solid var(--sk-card-border);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
-.dropdown-item {
-  font-weight: 500;
+.daily-report-image-button:hover .daily-report-list-image {
+  opacity: 0.9;
 }
 
-.dropdown-item:active {
-  background-color: var(--sk-primary);
-}
-
-.form-actions,
-.page-actions {
+.image-preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  padding: 2rem;
+  background-color: rgba(0, 0, 0, 0.78);
   display: flex;
-  gap: 0.5rem;
   align-items: center;
+  justify-content: center;
+}
+
+.image-preview-modal {
+  width: fit-content;
+  max-width: calc(100vw - 4rem);
+  max-height: calc(100vh - 4rem);
+  padding: 1.25rem;
+  border-radius: 16px;
+  background-color: #151a17;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.45);
+}
+
+.image-preview-modal-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 6.5rem);
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 12px;
+  background-color: #0f1210;
 }

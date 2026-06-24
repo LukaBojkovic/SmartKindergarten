@@ -1,6 +1,5 @@
 import DatePickerInput from "../common/DatePickerInput";
 
-
 function DailyReportForm({
   groups,
   form,
@@ -9,9 +8,12 @@ function DailyReportForm({
   canCreate,
   canEdit,
   onChange,
+  onImageChange,
+  onClearImage,
   onSubmit,
   onCancelEdit,
 }) {
+
   if (!canCreate && !canEdit) {
     return null;
   }
@@ -80,17 +82,42 @@ function DailyReportForm({
           </div>
 
           <div className="mb-3">
-            <label className="form-label">URL slike</label>
+            <label className="form-label" htmlFor="dailyReportImage">
+              Slika
+            </label>
+
             <input
-              name="imageUrl"
+              id="dailyReportImage"
+              type="file"
               className="form-control"
-              value={form.imageUrl}
-              onChange={onChange}
-              placeholder="Opcionalno: https://..."
+              accept="image/jpeg,image/png,image/webp"
+              onChange={onImageChange}
             />
+
             <div className="form-text">
-              Za sada unosimo link do slike. Upload slike možemo dodati kasnije.
+              Slika je opciona. Dozvoljeni formati su JPG, PNG i WEBP. Maksimalna
+              veličina slike je 500 KB.
             </div>
+
+            {form.imageUrl && (
+              <div className="daily-report-image-preview-wrapper mt-3">
+                <img
+                  src={form.imageUrl}
+                  alt="Pregled slike dnevnog izveštaja"
+                  className="daily-report-image-preview"
+                />
+
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={onClearImage}
+                  >
+                    Ukloni sliku
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="d-flex gap-2">
@@ -106,15 +133,13 @@ function DailyReportForm({
                   : "Kreiraj izveštaj"}
             </button>
 
-            {editingReportId && (
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={onCancelEdit}
-              >
-                Otkaži
-              </button>
-            )}
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={onCancelEdit}
+            >
+              Otkaži
+            </button>
           </div>
         </form>
       </div>
