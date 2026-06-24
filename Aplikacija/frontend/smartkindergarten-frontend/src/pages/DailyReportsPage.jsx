@@ -15,6 +15,14 @@ const initialForm = {
   reportDate: getTodayDateInputValue(),
 };
 
+const MAX_IMAGE_SIZE_BYTES = 500 * 1024;
+
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
+
 function DailyReportsPage() {
   const { user } = useAuth();
 
@@ -164,6 +172,48 @@ function DailyReportsPage() {
     }));
   };
 
+  const handleImageChange = async (event) => {
+  const file = event.target.files?.[0];
+
+  if (!file) {
+    return;
+  }
+
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    setError("Dozvoljeni formati slike su JPG, PNG i WEBP.");
+    event.target.value = "";
+    return;
+  }
+
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    setError("Slika je prevelika. Maksimalna veličina slike je 500 KB.");
+    event.target.value = "";
+    return;
+  }
+
+  try {
+    const base64Image = await convertFileToBase64(file);
+
+    setForm((previousForm) => ({
+      ...previousForm,
+      imageUrl: base64Image,
+    }));
+
+    setError("");
+  } catch {
+    setError("Došlo je do greške pri učitavanju slike.");
+  } finally {
+    event.target.value = "";
+  }
+};
+
+const handleClearImage = () => {
+  setForm((previousForm) => ({
+    ...previousForm,
+    imageUrl: "",
+  }));
+};
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -305,6 +355,8 @@ function DailyReportsPage() {
           canCreate={canCreate}
           canEdit={Boolean(editingReportId)}
           onChange={handleFormChange}
+          onImageChange={handleImageChange}
+          onClearImage={handleClearImage}
           onSubmit={handleSubmit}
           onCancelEdit={cancelEdit}
         />
@@ -332,6 +384,23 @@ function DailyReportsPage() {
       />
     </div>
   );
+}
+
+
+function convertFileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result);
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Greška pri čitanju fajla."));
+    };
+
+    reader.readAsDataURL(file);
+  });
 }
 
 function getTodayDateInputValue() {
