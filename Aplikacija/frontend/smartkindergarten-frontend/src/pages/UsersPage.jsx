@@ -156,6 +156,9 @@ function UsersPage()
   };
 
   const startEdit = (user) => {
+    setResetPasswordUser(null);
+    setResetPasswordForm(initialResetPasswordForm);
+
     setEditingUserId(user.id);
     setEditForm({
       email: user.email,
@@ -230,12 +233,16 @@ function UsersPage()
   };
 
   const startResetPassword = (user) => {
-  setResetPasswordUser(user);
-  setResetPasswordForm(initialResetPasswordForm);
-  setError("");
-  setSuccessMessage("");
+    setEditingUserId(null);
+    setEditForm(initialEditForm);
+    
+    setResetPasswordUser(user);
+    setResetPasswordForm(initialResetPasswordForm);
 
-  window.scrollTo({ top: 0, behavior: "smooth" });
+    setError("");
+    setSuccessMessage("");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const cancelResetPassword = () => {
@@ -319,8 +326,18 @@ const handleResetPasswordSubmit = async (event) => {
         <div className="alert alert-success">{successMessage}</div>
       )}
 
-      <div className="row g-4">
+      <div className="row g-4 align-items-start">
         <div className="col-lg-4">
+          {resetPasswordUser ? (
+            <ResetPasswordForm
+              selectedUser={resetPasswordUser}
+              form={resetPasswordForm}
+              isSaving={isResetPasswordSaving}
+              onChange={handleResetPasswordChange}
+              onSubmit={handleResetPasswordSubmit}
+              onCancel={cancelResetPassword}
+          />
+          ) : (
           <UserForm
             userRoles={USER_ROLES}
             editingUserId={editingUserId}
@@ -333,16 +350,8 @@ const handleResetPasswordSubmit = async (event) => {
             onEditSubmit={handleEditSubmit}
             onCancelEdit={cancelEdit}
           />
-        </div>
-
-          <ResetPasswordForm
-            selectedUser={resetPasswordUser}
-            form={resetPasswordForm}
-            isSaving={isResetPasswordSaving}
-            onChange={handleResetPasswordChange}
-            onSubmit={handleResetPasswordSubmit}
-            onCancel={cancelResetPassword}
-          />
+      )}
+      </div>
 
         <div className="col-lg-8">
           <div className="card shadow-sm">

@@ -55,34 +55,61 @@ function NotificationsList({
                   </div>
                 </div>
 
-                <div className="d-flex gap-2">
-                  {canMarkAsRead && (
+                {(canMarkAsRead || canModify) && (
+                  <div className="dropdown">
                     <button
-                      className="btn btn-sm btn-outline-success"
-                      onClick={() => onMarkAsRead(notification)}
+                      className="btn btn-sm btn-outline-primary dropdown-toggle"
+                      type="button"
+                      data-bs-toggle="dropdown"
                     >
-                      Označi kao pročitano
+                      Akcije
                     </button>
-                  )}
 
-                  {canModify && (
-                    <>
-                      <button
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={() => onStartEdit(notification)}
-                      >
-                        Izmeni
-                      </button>
+                    <ul className="dropdown-menu dropdown-menu-end">
+                      {canMarkAsRead && (
+                        <li>
+                          <button
+                            className="dropdown-item"
+                            type="button"
+                            onClick={() => onMarkAsRead(notification)}
+                          >
+                            Označi kao pročitano
+                          </button>
+                        </li>
+                      )}
 
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => onDelete(notification)}
-                      >
-                        Obriši
-                      </button>
-                    </>
-                  )}
-                </div>
+                      {canModify && (
+                        <>
+                          {canMarkAsRead && (
+                            <li>
+                              <hr className="dropdown-divider" />
+                            </li>
+                          )}
+
+                          <li>
+                            <button
+                              className="dropdown-item"
+                              type="button"
+                              onClick={() => onStartEdit(notification)}
+                            >
+                              Izmeni
+                            </button>
+                          </li>
+
+                          <li>
+                            <button
+                              className="dropdown-item text-danger"
+                              type="button"
+                              onClick={() => onDelete(notification)}
+                            >
+                              Obriši
+                            </button>
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               <p className="card-text">{notification.content}</p>

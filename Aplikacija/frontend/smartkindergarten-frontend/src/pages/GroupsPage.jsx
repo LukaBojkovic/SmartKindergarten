@@ -260,6 +260,16 @@ function GroupsPage()
     setSelectedGroup(group);
     setSelectedChildOption(null);
     setSelectedTeacherOption(null);
+
+    setError("");
+    setSuccessMessage("");
+
+  setTimeout(() => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth",
+    });
+  }, 100);
   };
 
   const handleAssignChild = async () => {

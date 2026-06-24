@@ -13,7 +13,7 @@ function ChildrenTable({
 
   return (
     <div className="table-responsive">
-      <table className="table table-striped table-hover align-middle">
+      <table className="table table-striped table-hover align-middle children-table app-table">
         <thead>
           <tr>
             <th>Ime i prezime</th>
@@ -66,28 +66,55 @@ function ChildrenTable({
 
               {canManage && (
                 <td className="text-end">
-                  <button
-                    className="btn btn-sm btn-outline-info me-2"
-                    onClick={() => onManageParents(child)}
-                  >
-                    Roditelji
-                  </button>
-
-                  <button
-                    className="btn btn-sm btn-outline-primary me-2"
-                    onClick={() => onEdit(child)}
-                  >
-                    Izmeni
-                  </button>
-
-                  {child.isActive && (
+                  <div className="dropdown">
                     <button
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => onDeactivate(child)}
+                      className="btn btn-sm btn-outline-primary dropdown-toggle"
+                      type="button"
+                      data-bs-toggle="dropdown"
                     >
-                      Deaktiviraj
+                      Akcije
                     </button>
-                  )}
+
+                    <ul className="dropdown-menu dropdown-menu-end">
+                      <li>
+                        <button
+                          className="dropdown-item"
+                          type="button"
+                          onClick={() => onManageParents(child)}
+                        >
+                          Roditelji
+                        </button>
+                      </li>
+
+                      <li>
+                        <button
+                          className="dropdown-item"
+                          type="button"
+                          onClick={() => onEdit(child)}
+                        >
+                          Izmeni
+                        </button>
+                      </li>
+
+                      {child.isActive && (
+                        <>
+                          <li>
+                            <hr className="dropdown-divider" />
+                          </li>
+
+                          <li>
+                            <button
+                              className="dropdown-item text-danger"
+                              type="button"
+                              onClick={() => onDeactivate(child)}
+                            >
+                              Deaktiviraj
+                            </button>
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
                 </td>
               )}
             </tr>

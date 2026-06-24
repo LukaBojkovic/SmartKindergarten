@@ -1,0 +1,298 @@
+:root {
+  --sk-primary: #4f8f70;
+  --sk-primary-dark: #3d7359;
+  --sk-secondary: #f4b860;
+  --sk-bg: #f7f9f6;
+  --sk-card-border: #e3e8e1;
+  --sk-text-muted: #6c757d;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: var(--sk-bg);
+  font-size: 0.95rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.navbar-brand {
+  letter-spacing: -0.03em;
+}
+
+.navbar.bg-primary {
+  background-color: var(--sk-primary) !important;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.navbar .nav-link {
+  font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+  color: #fff6df !important;
+}
+
+.btn-primary {
+  background-color: var(--sk-primary);
+  border-color: var(--sk-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--sk-primary-dark);
+  border-color: var(--sk-primary-dark);
+}
+
+.btn-outline-primary {
+  color: var(--sk-primary);
+  border-color: var(--sk-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--sk-primary);
+  border-color: var(--sk-primary);
+}
+
+.card {
+  border: 1px solid var(--sk-card-border);
+  border-radius: 14px;
+}
+
+.card.shadow-sm {
+  box-shadow: 0 0.25rem 0.75rem rgba(34, 64, 49, 0.08) !important;
+}
+
+.card-title {
+  font-weight: 700;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background-color: #eef4ec;
+  color: #2f4f3c;
+  font-weight: 700;
+}
+
+.badge.bg-success {
+  background-color: #4f8f70 !important;
+}
+
+.badge.bg-danger {
+  background-color: #c85c5c !important;
+}
+
+.badge.bg-secondary {
+  background-color: #7d8b83 !important;
+}
+
+.alert-info {
+  background-color: #edf6f1;
+  border-color: #cfe8d8;
+  color: #315b42;
+}
+
+.alert-secondary {
+  background-color: #f1f3f2;
+  border-color: #dfe5e1;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  font-weight: 800;
+  color: #274536;
+}
+
+.page-header p {
+  color: var(--sk-text-muted);
+}
+
+.form-label {
+  font-weight: 600;
+  color: #365343;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--sk-primary);
+  box-shadow: 0 0 0 0.2rem rgba(79, 143, 112, 0.18);
+}
+
+.btn {
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.btn-sm {
+  border-radius: 8px;
+}
+
+.container,
+.container-fluid {
+  max-width: 1320px;
+}
+
+.app-navbar .navbar-nav {
+  column-gap: 0.15rem;
+  row-gap: 0.25rem;
+}
+
+.app-navbar .nav-link {
+  white-space: nowrap;
+  padding-left: 0.55rem;
+  padding-right: 0.55rem;
+}
+
+.app-navbar .navbar-brand {
+  white-space: nowrap;
+  margin-right: 1.5rem;
+}
+
+.app-navbar .user-dropdown {
+  margin-left: 1rem;
+}
+
+.app-navbar .user-dropdown .dropdown-toggle {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.users-table th,
+.users-table td {
+  vertical-align: middle;
+}
+
+.users-table th {
+  white-space: nowrap;
+}
+
+.users-table td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.app-table th,
+.app-table td {
+  vertical-align: middle;
+}
+
+.app-table th {
+  white-space: nowrap;
+}
+
+.app-table td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.children-table td:nth-child(1),
+.groups-table td:nth-child(1) {
+  font-weight: 600;
+}
+
+.children-table td:nth-child(4),
+.groups-table td:nth-child(2) {
+  max-width: 320px;
+}
+
+.react-datepicker-wrapper {
+  display: block;
+}
+
+.react-datepicker__input-container {
+  display: block;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+}
+
+.form-label {
+  margin-bottom: 0.45rem;
+}
+
+.app-table th,
+.app-table td {
+  vertical-align: middle;
+}
+
+.app-table th {
+  white-space: nowrap;
+}
+
+.app-table td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.payments-table td:nth-child(4) {
+  max-width: 360px;
+}
+
+.development-chart-wrapper {
+  height: 320px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.development-score-badge {
+  background-color: rgba(79, 143, 112, 0.18);
+  color: #bfe7cd;
+  border: 1px solid rgba(79, 143, 112, 0.45);
+  padding: 0.55rem 0.75rem;
+}
+
+.app-table th,
+.app-table td {
+  vertical-align: middle;
+}
+
+.app-table th {
+  white-space: nowrap;
+}
+
+.app-table td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.payments-table td:nth-child(4) {
+  max-width: 360px;
+}
+
+.dropdown-menu {
+  border-radius: 12px;
+  border-color: var(--sk-card-border);
+}
+
+.dropdown-item {
+  font-weight: 500;
+}
+
+.dropdown-item:active {
+  background-color: var(--sk-primary);
+}
+
+.form-actions,
+.page-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

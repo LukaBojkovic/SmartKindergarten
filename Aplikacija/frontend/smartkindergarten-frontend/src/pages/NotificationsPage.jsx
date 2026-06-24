@@ -22,6 +22,8 @@ function NotificationsPage() {
   const [form, setForm] = useState(initialForm);
   const [selectedRecipients, setSelectedRecipients] = useState([]);
   const [editingNotificationId, setEditingNotificationId] = useState(null);
+  const [isNotificationFormVisible, setIsNotificationFormVisible] =
+  useState(false);
 
   const [scope, setScope] = useState(
     user?.role === "Administrator" ? "all" : "my"
@@ -77,40 +79,41 @@ function NotificationsPage() {
   }, [isAdmin, scope]);
 
   useEffect(() => {
-    if (!canSend) {
-      return;
-    }
+  if (!canSend) {
+    return;
+  }
 
-    let isCancelled = false;
+  let isCancelled = false;
 
-    setIsLoadingRecipients(true);
+  setIsLoadingRecipients(true);
 
-    const request =
-      user?.role === "Administrator"
-        ? loadAdminRecipientOptions(currentUserId)
-        : loadParentRecipientOptions();
+  const isAdministrator = user?.role === "Administrator";
 
-    request
-      .then((options) => {
-        if (!isCancelled) {
-          setRecipientOptions(options);
-        }
-      })
-      .catch((requestError) => {
-        if (!isCancelled) {
-          setError(getErrorMessage(requestError));
-        }
-      })
-      .finally(() => {
-        if (!isCancelled) {
-          setIsLoadingRecipients(false);
-        }
-      });
+  const request = isAdministrator
+    ? loadAdminRecipientOptions(currentUserId)
+    : loadParentRecipientOptions();
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [canSend, user?.role, currentUserId]);
+  request
+    .then((options) => {
+      if (!isCancelled) {
+        setRecipientOptions(options);
+      }
+    })
+    .catch((requestError) => {
+      if (!isCancelled) {
+        setError(getErrorMessage(requestError));
+      }
+    })
+    .finally(() => {
+      if (!isCancelled) {
+        setIsLoadingRecipients(false);
+      }
+    });
+
+  return () => {
+    isCancelled = true;
+  };
+}, [canSend, user?.role, currentUserId]);
 
   const filteredNotifications = useMemo(() => {
     return notifications.filter((notification) => {
@@ -150,6 +153,22 @@ function NotificationsPage() {
     }
   };
 
+  const openCreateNotificationForm = () => {
+  setEditingNotificationId(null);
+  setForm(initialForm);
+  setSelectedRecipients([]);
+
+  setIsNotificationFormVisible(true);
+  setError("");
+  setSuccessMessage("");
+
+  setTimeout(() => {
+    document
+      .getElementById("notification-form-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
+};
+
   const handleFormChange = (event) => {
     const { name, value } = event.target;
 
@@ -182,11 +201,11 @@ function NotificationsPage() {
             (recipient) => recipient.value
           ),
         });
-
         setSuccessMessage("Obaveštenje je uspešno poslato.");
       }
 
       resetForm();
+      setIsNotificationFormVisible(false);
       await loadNotifications();
     } catch (requestError) {
       setError(getErrorMessage(requestError));
@@ -210,14 +229,20 @@ function NotificationsPage() {
       }))
     );
 
+    setIsNotificationFormVisible(true);
     setError("");
     setSuccessMessage("");
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+    document
+      .getElementById("notification-form-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
   };
 
   const cancelEdit = () => {
     resetForm();
+    setIsNotificationFormVisible(false);
   };
 
   const markAsRead = async (notification) => {
@@ -290,13 +315,24 @@ function NotificationsPage() {
           <p className="text-muted mb-0">{pageDescription}</p>
         </div>
 
-        <button
-          className="btn btn-outline-primary"
-          onClick={loadNotifications}
-          disabled={isLoadingNotifications}
-        >
-          Osveži
-        </button>
+        <div className="d-flex gap-2">
+          {canSend && (
+            <button
+              className="btn btn-primary"
+              onClick={openCreateNotificationForm}
+            >
+              Novo obaveštenje
+            </button>
+          )}
+
+          <button
+            className="btn btn-outline-primary"
+            onClick={loadNotifications}
+            disabled={isLoadingNotifications}
+          >
+            Osveži
+          </button>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
@@ -305,8 +341,8 @@ function NotificationsPage() {
         <div className="alert alert-success">{successMessage}</div>
       )}
 
-      {canSend && (
-        <>
+     {canSend && isNotificationFormVisible && (
+        <div id="notification-form-section">
           {isLoadingRecipients && (
             <div className="alert alert-info">Učitavanje primalaca...</div>
           )}
@@ -324,7 +360,7 @@ function NotificationsPage() {
             onSubmit={handleSubmit}
             onCancelEdit={cancelEdit}
           />
-        </>
+        </div>
       )}
 
       <NotificationsFilters

@@ -15,7 +15,7 @@ function PaymentsTable({
         <h5 className="card-title">Uplate</h5>
 
         <div className="table-responsive">
-          <table className="table table-striped table-hover align-middle">
+          <table className="table table-striped table-hover align-middle app-table payments-table">
             <thead>
               <tr>
                 <th>Dete</th>
@@ -49,19 +49,41 @@ function PaymentsTable({
 
                   {canManage && (
                     <td className="text-end">
-                      <button
-                        className="btn btn-sm btn-outline-primary me-2"
-                        onClick={() => onStartEdit(payment)}
-                      >
-                        Izmeni
-                      </button>
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-sm btn-outline-primary dropdown-toggle"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                        >
+                          Akcije
+                        </button>
 
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => onDelete(payment)}
-                      >
-                        Obriši
-                      </button>
+                        <ul className="dropdown-menu dropdown-menu-end">
+                          <li>
+                            <button
+                              className="dropdown-item"
+                              type="button"
+                              onClick={() => onStartEdit(payment)}
+                            >
+                              Izmeni
+                            </button>
+                          </li>
+
+                          <li>
+                            <hr className="dropdown-divider" />
+                          </li>
+
+                          <li>
+                            <button
+                              className="dropdown-item text-danger"
+                              type="button"
+                              onClick={() => onDelete(payment)}
+                            >
+                              Obriši
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
                     </td>
                   )}
                 </tr>

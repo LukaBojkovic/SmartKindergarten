@@ -21,14 +21,33 @@ ChartJS.register(
   Legend
 );
 
+const AREA_COLORS = {
+  SocialSkills: "#4f8f70",
+  CognitiveSkills: "#4f7cac",
+  MotorSkills: "#f4b860",
+  Communication: "#9b6bcc",
+  EmotionalDevelopment: "#d96c75",
+};
+
 function DevelopmentProgressChart({ progressPoints, selectedArea }) {
+  const areaColor = AREA_COLORS[selectedArea] || "#4f8f70";
+  const latestPoint = progressPoints[progressPoints.length - 1];
+  
   const chartData = {
     labels: progressPoints.map((point) => formatDate(point.date)),
     datasets: [
       {
         label: getDevelopmentAreaLabel(selectedArea),
         data: progressPoints.map((point) => point.score),
-        tension: 0.3,
+        borderColor: areaColor,
+        backgroundColor: areaColor,
+        pointBackgroundColor: areaColor,
+        pointBorderColor: "#ffffff",
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        borderWidth: 3,
+        tension: 0.35,
       },
     ],
   };
@@ -36,28 +55,68 @@ function DevelopmentProgressChart({ progressPoints, selectedArea }) {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: "#dfe8e2",
+          font: {
+            weight: "600",
+          },
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => `Ocena: ${context.parsed.y}/5`,
+        },
+      },
+    },
     scales: {
+      x: {
+        ticks: {
+          color: "#b8c7be",
+        },
+        grid: {
+          color: "rgba(255, 255, 255, 0.06)",
+        },
+      },
       y: {
         min: 1,
         max: 5,
         ticks: {
           stepSize: 1,
+          color: "#b8c7be",
+        },
+        grid: {
+          color: "rgba(255, 255, 255, 0.08)",
         },
       },
     },
   };
 
   return (
-    <div className="card shadow-sm mb-4">
+    <div className="card shadow-sm mb-4 development-chart-card">
       <div className="card-body">
-        <h5 className="card-title">Grafički prikaz napretka</h5>
+        <div className="d-flex justify-content-between align-items-start gap-3 mb-3">
+          <div>
+            <h5 className="card-title mb-1">Grafički prikaz napretka</h5>
+            <p className="text-muted mb-0">
+              Oblast: {getDevelopmentAreaLabel(selectedArea)}
+            </p>
+          </div>
+
+          {latestPoint && (
+            <span className="badge development-score-badge">
+              Poslednja ocena: {latestPoint.score}/5
+            </span>
+          )}
+        </div>
 
         {progressPoints.length === 0 ? (
           <div className="alert alert-info mb-0">
             Nema dovoljno podataka za prikaz grafikona.
           </div>
         ) : (
-          <div style={{ height: "320px" }}>
+          <div className="development-chart-wrapper">
             <Line data={chartData} options={chartOptions} />
           </div>
         )}

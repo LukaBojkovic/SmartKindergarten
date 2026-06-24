@@ -13,7 +13,7 @@ function GroupsTable({
 
   return (
     <div className="table-responsive">
-      <table className="table table-striped table-hover align-middle">
+      <table className="table table-striped table-hover align-middle groups-table app-table">
         <thead>
           <tr>
             <th>Naziv</th>
@@ -43,30 +43,55 @@ function GroupsTable({
               <td>{group.children.length}</td>
               <td>{group.teachers.length}</td>
               <td className="text-end">
-                <button
-                  className="btn btn-sm btn-outline-info me-2"
-                  onClick={() => onSelect(group)}
-                >
-                  Detalji
-                </button>
+                <div className="dropdown">
+                  <button
+                    className="btn btn-sm btn-outline-primary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                  >
+                    Akcije
+                  </button>
 
-                {canManage && (
-                  <>
-                    <button
-                      className="btn btn-sm btn-outline-primary me-2"
-                      onClick={() => onEdit(group)}
-                    >
-                      Izmeni
-                    </button>
+                  <ul className="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        type="button"
+                        onClick={() => onSelect(group)}
+                      >
+                        Detalji
+                      </button>
+                    </li>
 
-                    <button
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => onDelete(group)}
-                    >
-                      Obriši
-                    </button>
-                  </>
-                )}
+                    {canManage && (
+                      <>
+                        <li>
+                          <button
+                            className="dropdown-item"
+                            type="button"
+                            onClick={() => onEdit(group)}
+                          >
+                            Izmeni
+                          </button>
+                        </li>
+
+                        <li>
+                          <hr className="dropdown-divider" />
+                        </li>
+
+                        <li>
+                          <button
+                            className="dropdown-item text-danger"
+                            type="button"
+                            onClick={() => onDelete(group)}
+                          >
+                            Obriši
+                          </button>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </div>
               </td>
             </tr>
           ))}

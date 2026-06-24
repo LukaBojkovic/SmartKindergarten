@@ -9,13 +9,20 @@ function DashboardPage() {
       { title: "Korisnici", text: "Upravljanje korisničkim nalozima.", path: "/users" },
       { title: "Deca", text: "Pregled i upravljanje podacima o deci.", path: "/children" },
       { title: "Grupe", text: "Upravljanje vrtićkim grupama.", path: "/groups" },
+      { title: "Razvojni profil", text: "Pregled razvojnih profila dece.", path: "/development-profile" },
+      { title: "Prisustvo", text: "Pregled i evidencija prisustva.", path: "/attendance" },
+      { title: "Dnevni izveštaji", text: "Pregled dnevnih izveštaja.", path: "/daily-reports" },
+      { title: "Obaveštenja", text: "Pregled i slanje obaveštenja.", path: "/notifications" },
+      { title: "Finansije", text: "Pregled i upravljanje uplatama.", path: "/finance" },
       { title: "Podešavanja", text: "Osnovna sistemska podešavanja.", path: "/system-settings" },
     ],
     Teacher: [
       { title: "Deca", text: "Pregled dece iz dodeljenih grupa.", path: "/children" },
+      { title: "Grupe", text: "Pregled dodeljenih grupa.", path: "/groups" },
       { title: "Razvojni profil", text: "Beleške, procene i napredak deteta.", path: "/development-profile" },
       { title: "Prisustvo", text: "Evidencija prisustva dece.", path: "/attendance" },
       { title: "Dnevni izveštaji", text: "Kreiranje i pregled izveštaja.", path: "/daily-reports" },
+      { title: "Obaveštenja", text: "Pregled i slanje obaveštenja.", path: "/notifications" },
     ],
     Parent: [
       { title: "Razvojni profil", text: "Pregled razvoja deteta.", path: "/development-profile" },
@@ -25,7 +32,11 @@ function DashboardPage() {
     ],
     AdministrativeStaff: [
       { title: "Deca", text: "Administrativni pregled dece.", path: "/children" },
+      { title: "Prisustvo", text: "Pregled evidencije prisustva.", path: "/attendance" },
+      { title: "Dnevni izveštaji", text: "Pregled dnevnih izveštaja.", path: "/daily-reports" },
+      { title: "Obaveštenja", text: "Pregled i slanje obaveštenja.", path: "/notifications" },
       { title: "Finansije", text: "Upravljanje uplatama.", path: "/finance" },
+      { title: "Podešavanja", text: "Pregled osnovnih podešavanja.", path: "/system-settings" },
     ],
   };
 

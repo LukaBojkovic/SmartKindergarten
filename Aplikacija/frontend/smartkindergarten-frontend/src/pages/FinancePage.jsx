@@ -32,6 +32,7 @@ function FinancePage() {
 
   const [form, setForm] = useState(initialForm);
   const [editingPaymentId, setEditingPaymentId] = useState(null);
+  const [isPaymentFormVisible, setIsPaymentFormVisible] = useState(false);
 
   const [isLoadingChildren, setIsLoadingChildren] = useState(true);
   const [isLoadingMonthlyFee, setIsLoadingMonthlyFee] = useState(true);
@@ -168,7 +169,6 @@ function FinancePage() {
     };
   }, []);
 
-  // Učitava uplate i finansijski status za izabrano dete.
   useEffect(() => {
     if (!selectedChildId) {
       setPayments([]);
@@ -250,6 +250,25 @@ function FinancePage() {
     }
   };
 
+  const openCreatePaymentForm = () => {
+  setEditingPaymentId(null);
+
+  setForm({
+    ...initialForm,
+    paymentDate: getTodayDateInputValue(),
+  });
+
+  setIsPaymentFormVisible(true);
+  setError("");
+  setSuccessMessage("");
+
+  setTimeout(() => {
+    document
+      .getElementById("payment-form-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
+};
+
   const handleFormChange = (event) => {
     const { name, value } = event.target;
 
@@ -291,6 +310,7 @@ function FinancePage() {
       }
 
       resetForm();
+      setIsPaymentFormVisible(false);
       await loadFinance();
     } catch (requestError) {
       setError(getErrorMessage(requestError));
@@ -308,14 +328,20 @@ function FinancePage() {
       description: payment.description || "",
     });
 
+    setIsPaymentFormVisible(true);
     setError("");
     setSuccessMessage("");
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+    document
+      .getElementById("payment-form-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
   };
 
   const cancelEdit = () => {
     resetForm();
+    setIsPaymentFormVisible(false);
   };
 
   const deletePayment = async (payment) => {
@@ -364,14 +390,26 @@ function FinancePage() {
           <h1>Finansije</h1>
           <p className="text-muted mb-0">{pageDescription}</p>
         </div>
+        
+        <div className="d-flex gap-2">
+          {canManage && (
+            <button
+              className="btn btn-primary"
+              onClick={openCreatePaymentForm}
+              disabled={!selectedChildId}
+            >
+              Evidentiraj uplatu
+            </button>
+          )}
 
-        <button
-          className="btn btn-outline-primary"
-          onClick={loadFinance}
-          disabled={!selectedChildId || isLoadingFinance}
-        >
-          Osveži
-        </button>
+          <button
+            className="btn btn-outline-primary"
+            onClick={loadFinance}
+            disabled={!selectedChildId || isLoadingFinance}
+          >
+            Osveži
+          </button>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
@@ -408,7 +446,8 @@ function FinancePage() {
         numberOfMonths={numberOfMonths}
       />
 
-      {canManage && (
+      {canManage && isPaymentFormVisible && (
+      <div id="payment-form-section">
         <PaymentForm
           form={form}
           editingPaymentId={editingPaymentId}
@@ -419,6 +458,7 @@ function FinancePage() {
           onSubmit={handleSubmit}
           onCancelEdit={cancelEdit}
         />
+      </div>
       )}
 
       <PaymentsTable

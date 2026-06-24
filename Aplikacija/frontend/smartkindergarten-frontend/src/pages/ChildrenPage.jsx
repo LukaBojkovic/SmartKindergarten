@@ -315,6 +315,13 @@ function ChildrenPage() {
   setSelectedParentOption(null);
   setError("");
   setSuccessMessage("");
+
+  setTimeout(() => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth",
+    });
+  }, 100);
 };
 
 const handleAssignParent = async () => {

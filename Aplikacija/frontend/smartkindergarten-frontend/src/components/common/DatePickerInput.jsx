@@ -34,6 +34,7 @@ function DatePickerInput({
       dateFormat="dd/MM/yyyy"
       locale="sr-Latn"
       className="form-control"
+      wrapperClassName="w-100"
       placeholderText={placeholder}
       required={required}
       disabled={disabled}

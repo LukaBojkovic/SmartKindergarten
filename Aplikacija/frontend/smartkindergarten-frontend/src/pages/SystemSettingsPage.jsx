@@ -24,10 +24,6 @@ function SystemSettingsPage() {
 
   const canManage = user?.role === "Administrator";
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
   const loadSettings = async () => {
     setIsLoading(true);
     setError("");
@@ -39,6 +35,11 @@ function SystemSettingsPage() {
       setIsLoading(false);
     }
   };
+
+    useEffect(() => {
+    loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadMonthlyFee = async () => {
     try {
@@ -120,6 +121,7 @@ function SystemSettingsPage() {
       setMonthlyFee(savedMonthlyFee.value);
 
       setSuccessMessage("Sistemska podešavanja su uspešno sačuvana.");
+      window.dispatchEvent(new Event("system-settings:updated"));
     } catch (requestError) {
       setError(getErrorMessage(requestError));
     } finally {

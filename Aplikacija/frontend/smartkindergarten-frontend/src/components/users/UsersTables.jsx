@@ -11,7 +11,7 @@ function UsersTables({
 
   return (
     <div className="table-responsive">
-      <table className="table table-striped table-hover align-middle">
+      <table className="table table-striped table-hover align-middle users-table">
         <thead>
           <tr>
             <th>Korisničko ime</th>
@@ -48,28 +48,55 @@ function UsersTables({
                 )}
               </td>
               <td className="text-end">
-                <button
-                  className="btn btn-sm btn-outline-primary me-2"
-                  onClick={() => onEdit(user)}
-                >
-                  Izmeni
+                <div className="dropdown">
+                  <button
+                    className="btn btn-sm btn-outline-primary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                  >
+                  Akcije
                 </button>
 
-                <button
-                  className="btn btn-sm btn-outline-warning me-2"
-                  onClick={() => onResetPassword(user)}
-                >
-                  Reset lozinke
-              </button>
+                  <ul className="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        type="button"
+                        onClick={() => onEdit(user)}
+                      >
+                        Izmeni
+                      </button>
+                    </li>
 
-                {user.isActive && (
-                  <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => onDeactivate(user)}
-                  >
-                    Deaktiviraj
-                  </button>
-                )}
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        type="button"
+                        onClick={() => onResetPassword(user)}
+                      >
+                        Reset lozinke
+                      </button>
+                    </li>
+
+                  {user.isActive && (
+                    <>
+                      <li>
+                        <hr className="dropdown-divider" />
+                      </li>
+
+                      <li>
+                        <button
+                          className="dropdown-item text-danger"
+                          type="button"
+                          onClick={() => onDeactivate(user)}
+                        >
+                          Deaktiviraj
+                        </button>
+                      </li>
+                      </>
+                    )}
+                  </ul>
+                </div>
               </td>
             </tr>
           ))}

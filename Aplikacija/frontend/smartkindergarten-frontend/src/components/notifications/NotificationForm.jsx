@@ -102,15 +102,13 @@ function NotificationForm({
                   : "Pošalji obaveštenje"}
             </button>
 
-            {editingNotificationId && (
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={onCancelEdit}
-              >
-                Otkaži
-              </button>
-            )}
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={onCancelEdit}
+            >
+              Otkaži
+            </button>
           </div>
         </form>
       </div>
