@@ -8,6 +8,7 @@ import DevelopmentNotesSection from "../components/developmentProfile/Developmen
 import DevelopmentProgressChart from "../components/developmentProfile/DevelopmentProgressChart";
 import { developmentAreas } from "../constants/developmentAreas";
 import { useAuth } from "../hooks/useAuth";
+import { FaSyncAlt } from "react-icons/fa";
 
 const initialNoteForm = {
   content: "",
@@ -390,6 +391,7 @@ function DevelopmentProfilePage()
           onClick={loadProfile}
           disabled={!selectedChildId || isLoadingProfile}
         >
+          <FaSyncAlt className="me-2" />
           Osveži
         </button>
       </div>

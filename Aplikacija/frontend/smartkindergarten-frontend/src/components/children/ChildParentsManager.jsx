@@ -1,3 +1,4 @@
+import { FaPlus, FaTrashAlt } from "react-icons/fa";
 import Select from "react-select";
 
 function ChildParentsManager({
@@ -47,6 +48,7 @@ function ChildParentsManager({
             onClick={onAssignParent}
             disabled={!selectedParentOption || isSaving}
           >
+            <FaPlus className="me-2" />
             Poveži roditelja
           </button>
         </div>
@@ -80,6 +82,7 @@ function ChildParentsManager({
                 onClick={() => onRemoveParent(parent)}
                 disabled={isSaving}
               >
+                <FaTrashAlt className="me-2" />
                 Ukloni
               </button>
             </li>

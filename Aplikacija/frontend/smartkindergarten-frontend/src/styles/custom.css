@@ -43,28 +43,45 @@ h6,
 .app-navbar .navbar-nav {
   column-gap: 0.15rem;
   row-gap: 0.25rem;
+  min-width: 0;
 }
 
 .app-navbar .nav-link {
   white-space: nowrap;
-  padding-left: 0.55rem;
-  padding-right: 0.55rem;
+  padding-left: 0.35rem;
+  padding-right: 0.35rem;
+  font-size: 0.88rem;
 }
 
 .app-navbar .navbar-brand {
   white-space: nowrap;
-  margin-right: 1.5rem;
+  margin-right: 0.75rem;
+  overflow: visible;
+  text-overflow: clip;
+  flex-shrink: 0;
 }
 
 .app-navbar .user-dropdown {
   margin-left: 1rem;
+  flex-shrink: 0;
 }
 
 .app-navbar .user-dropdown .dropdown-toggle {
-  max-width: 220px;
+  max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.app-navbar .container-fluid {
+  max-width: none;
+  width: 100%;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.app-navbar .navbar-collapse {
+  min-width: 0;
 }
 
 .btn {
@@ -314,4 +331,82 @@ h6,
   object-fit: contain;
   border-radius: 12px;
   background-color: #0f1210;
+}
+
+.nav-link-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nav-link-icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.app-navbar .dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.app-navbar .nav-link {
+  white-space: nowrap;
+  padding-left: 0.35rem;
+  padding-right: 0.35rem;
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .app-navbar .navbar-brand {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .app-navbar .nav-link {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    font-size: 0.82rem;
+  }
+
+  .app-navbar .nav-link-content {
+    gap: 0.25rem;
+  }
+
+  .app-navbar .user-dropdown {
+    margin-left: 0.5rem;
+  }
+
+  .app-navbar .user-dropdown .dropdown-toggle {
+    max-width: 160px;
+  }
+}
+
+.dashboard-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(79, 143, 112, 0.45);
+  box-shadow: 0 0.5rem 1rem rgba(34, 64, 49, 0.12) !important;
+}
+
+.dashboard-card-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background-color: rgba(79, 143, 112, 0.14);
+  color: var(--sk-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.btn svg {
+  vertical-align: -0.125em;
 }

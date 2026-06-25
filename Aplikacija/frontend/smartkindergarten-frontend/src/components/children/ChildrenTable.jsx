@@ -1,3 +1,5 @@
+import { FaEdit, FaTrashAlt, FaUsers } from "react-icons/fa";
+
 function ChildrenTable({
    childrenList,
    isLoading,
@@ -82,6 +84,7 @@ function ChildrenTable({
                           type="button"
                           onClick={() => onManageParents(child)}
                         >
+                          <FaUsers className="me-2" />
                           Roditelji
                         </button>
                       </li>
@@ -92,6 +95,7 @@ function ChildrenTable({
                           type="button"
                           onClick={() => onEdit(child)}
                         >
+                          <FaEdit className="me-2" />
                           Izmeni
                         </button>
                       </li>
@@ -108,6 +112,7 @@ function ChildrenTable({
                               type="button"
                               onClick={() => onDeactivate(child)}
                             >
+                              <FaTrashAlt className="me-2" />
                               Deaktiviraj
                             </button>
                           </li>

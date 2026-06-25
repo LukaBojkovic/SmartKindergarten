@@ -1,3 +1,5 @@
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
+
 function NotificationsList({
   notifications,
   isLoading,
@@ -92,6 +94,7 @@ function NotificationsList({
                               type="button"
                               onClick={() => onStartEdit(notification)}
                             >
+                              <FaEdit className="me-2" />
                               Izmeni
                             </button>
                           </li>
@@ -102,6 +105,7 @@ function NotificationsList({
                               type="button"
                               onClick={() => onDelete(notification)}
                             >
+                              <FaTrashAlt className="me-2" />
                               Obriši
                             </button>
                           </li>

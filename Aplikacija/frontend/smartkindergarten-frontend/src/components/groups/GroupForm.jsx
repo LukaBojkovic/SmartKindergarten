@@ -1,3 +1,5 @@
+import { FaPlus, FaSave, FaUndo } from "react-icons/fa";
+
 function GroupForm({
   editingGroupId,
   createForm,
@@ -45,6 +47,7 @@ function GroupForm({
               className="btn btn-primary w-100"
               disabled={isSaving}
             >
+              <FaPlus className="me-2" />
               {isSaving ? "Čuvanje..." : "Kreiraj grupu"}
             </button>
           </form>
@@ -87,6 +90,7 @@ function GroupForm({
               className="btn btn-success"
               disabled={isSaving}
             >
+              <FaSave className="me-2" />
               Sačuvaj izmene
             </button>
 
@@ -95,6 +99,7 @@ function GroupForm({
               className="btn btn-outline-secondary"
               onClick={onCancelEdit}
             >
+              <FaUndo className="me-2" />
               Nazad na dodavanje
             </button>
           </div>

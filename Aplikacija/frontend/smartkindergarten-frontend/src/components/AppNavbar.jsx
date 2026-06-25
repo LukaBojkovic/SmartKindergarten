@@ -4,40 +4,54 @@ import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import systemSettingsApi from "../api/systemSettingsApi";
 
+import {
+  FaBell,
+  FaCalendarCheck,
+  FaChartLine,
+  FaChild,
+  FaClipboardList,
+  FaCog,
+  FaLayerGroup,
+  FaMoneyBillWave,
+  FaSignOutAlt,
+  FaUserCircle,
+  FaUsers,
+} from "react-icons/fa";
+
 const NAV_LINKS_BY_ROLE = {
   Administrator: [
-    { to: "/users", label: "Korisnici" },
-    { to: "/children", label: "Deca" },
-    { to: "/groups", label: "Grupe" },
-    { to: "/development-profile", label: "Razvojni profil" },
-    { to: "/attendance", label: "Prisustvo" },
-    { to: "/daily-reports", label: "Dnevni izveštaji" },
-    { to: "/notifications", label: "Obaveštenja" },
-    { to: "/finance", label: "Finansije" },
-    { to: "/system-settings", label: "Podešavanja" },
+    { to: "/users", label: "Korisnici", icon: <FaUsers/>},
+    { to: "/children", label: "Deca", icon: <FaChild/> },
+    { to: "/groups", label: "Grupe", icon: <FaLayerGroup />  },
+    { to: "/development-profile", label: "Razvojni profil", icon: <FaChartLine /> },
+    { to: "/attendance", label: "Prisustvo", icon: <FaCalendarCheck /> },
+    { to: "/daily-reports", label: "Dnevni izveštaji", icon: <FaClipboardList /> },
+    { to: "/notifications", label: "Obaveštenja", icon: <FaBell /> },
+    { to: "/finance", label: "Finansije", icon: <FaMoneyBillWave /> },
+    { to: "/system-settings", label: "Podešavanja", icon: <FaCog /> },
   ],
 
   Teacher: [
-    { to: "/children", label: "Deca" },
-    { to: "/groups", label: "Grupe" },
-    { to: "/development-profile", label: "Razvojni profil" },
-    { to: "/attendance", label: "Prisustvo" },
-    { to: "/daily-reports", label: "Dnevni izveštaji" },
-    { to: "/notifications", label: "Obaveštenja" },
+    { to: "/children", label: "Deca", icon: <FaChild /> },
+    { to: "/groups", label: "Grupe", icon: <FaLayerGroup /> },
+    { to: "/development-profile", label: "Razvojni profil", icon: <FaChartLine /> },
+    { to: "/attendance", label: "Prisustvo", icon: <FaCalendarCheck /> },
+    { to: "/daily-reports", label: "Dnevni izveštaji", icon: <FaClipboardList /> },
+    { to: "/notifications", label: "Obaveštenja", icon: <FaBell /> },
   ],
 
   Parent: [
-    { to: "/development-profile", label: "Razvojni profil" },
-    { to: "/daily-reports", label: "Dnevni izveštaji" },
-    { to: "/notifications", label: "Obaveštenja" },
-    { to: "/finance", label: "Finansije" },
+    { to: "/development-profile", label: "Razvojni profil", icon: <FaChartLine /> },
+    { to: "/daily-reports", label: "Dnevni izveštaji", icon: <FaClipboardList /> },
+    { to: "/notifications", label: "Obaveštenja", icon: <FaBell /> },
+    { to: "/finance", label: "Finansije", icon: <FaMoneyBillWave /> },
   ],
 
   AdministrativeStaff: [
-    { to: "/children", label: "Deca" },
-    { to: "/attendance", label: "Prisustvo" },
-    { to: "/notifications", label: "Obaveštenja" },
-    { to: "/finance", label: "Finansije" },
+    { to: "/children", label: "Deca", icon: <FaChild /> },
+    { to: "/attendance", label: "Prisustvo", icon: <FaCalendarCheck /> },
+    { to: "/notifications", label: "Obaveštenja", icon: <FaBell /> },
+    { to: "/finance", label: "Finansije", icon: <FaMoneyBillWave /> },
   ],
 };
 
@@ -118,7 +132,10 @@ function AppNavbar() {
             {navLinks.map((link) => (
               <li className="nav-item" key={link.to}>
                 <Link className="nav-link" to={link.to}>
-                  {link.label}
+                  <span className="nav-link-content">
+                    <span className="nav-link-icon">{link.icon}</span>
+                    <span>{link.label}</span>
+                  </span>
                 </Link>
               </li>
             ))}
@@ -130,6 +147,7 @@ function AppNavbar() {
               type="button"
               data-bs-toggle="dropdown"
             >
+              <FaUserCircle className="me-1" />
               {user?.fullName}
             </button>
 
@@ -140,6 +158,7 @@ function AppNavbar() {
 
               <li>
                 <Link className="dropdown-item" to="/account">
+                  <FaUserCircle className="me-2" />
                   Moj nalog
                 </Link>
               </li>
@@ -149,9 +168,10 @@ function AppNavbar() {
               </li>
 
               <li>
-                <button className="dropdown-item" onClick={handleLogout}>
-                  Odjava
-                </button>
+               <button className="dropdown-item" onClick={handleLogout}>
+                <FaSignOutAlt className="me-2" />
+                Odjava
+              </button>
               </li>
             </ul>
           </div>

@@ -7,6 +7,7 @@ import GroupAssignments from "../components/groups/GroupAssignments";
 import GroupForm from "../components/groups/GroupForm";
 import GroupsTable from "../components/groups/GroupsTable";
 import { useAuth } from "../hooks/useAuth";
+import { FaSyncAlt } from "react-icons/fa";
 
 const initialCreateForm = {
   name: "",
@@ -393,6 +394,7 @@ function GroupsPage()
         </div>
 
         <button className="btn btn-outline-primary" onClick={loadGroups}>
+          <FaSyncAlt className="me-2" />
           Osveži
         </button>
       </div>

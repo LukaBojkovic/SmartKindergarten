@@ -1,3 +1,5 @@
+import { FaKey, FaTimes } from "react-icons/fa";
+
 function ResetPasswordForm({
   selectedUser,
   form,
@@ -60,6 +62,7 @@ function ResetPasswordForm({
               className="btn btn-warning"
               disabled={isSaving}
             >
+              <FaKey className="me-2" />
               {isSaving ? "Resetovanje..." : "Resetuj lozinku"}
             </button>
 
@@ -68,6 +71,7 @@ function ResetPasswordForm({
               className="btn btn-outline-secondary"
               onClick={onCancel}
             >
+              <FaTimes className="me-2" />
               Otkaži
             </button>
           </div>

@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from "react";
+import { FaSave } from "react-icons/fa";
 import systemSettingsApi from "../api/systemSettingsApi";
 import { useAuth } from "../hooks/useAuth";
 
@@ -241,6 +242,7 @@ function SystemSettingsPage() {
               className="btn btn-primary"
               disabled={isSaving}
             >
+              <FaSave className="me-2" />
               {isSaving ? "Čuvanje..." : "Sačuvaj podešavanja"}
             </button>
           )}

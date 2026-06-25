@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 function DailyReportsList({
   reports,
@@ -55,6 +56,7 @@ function DailyReportsList({
                             type="button"
                             onClick={() => onStartEdit(report)}
                           >
+                            <FaEdit className="me-2" />
                             Izmeni
                           </button>
                         </li>
@@ -74,6 +76,7 @@ function DailyReportsList({
                               type="button"
                               onClick={() => onDelete(report)}
                             >
+                              <FaTrashAlt className="me-2" />
                               Obriši
                             </button>
                           </li>

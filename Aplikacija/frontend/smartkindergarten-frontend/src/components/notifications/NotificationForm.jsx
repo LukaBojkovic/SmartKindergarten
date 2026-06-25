@@ -1,4 +1,4 @@
-
+import { FaPaperPlane, FaSave, FaTimes } from "react-icons/fa";
 import Select from "react-select";
 
 function NotificationForm({
@@ -95,6 +95,11 @@ function NotificationForm({
                 (!editingNotificationId && selectedRecipients.length === 0)
               }
             >
+              {editingNotificationId ? (
+                <FaSave className="me-2" />
+              ) : (
+                <FaPaperPlane className="me-2" />
+              )}
               {isSaving
                 ? "Čuvanje..."
                 : editingNotificationId
@@ -107,6 +112,7 @@ function NotificationForm({
               className="btn btn-outline-secondary"
               onClick={onCancelEdit}
             >
+              <FaTimes className="me-2" />
               Otkaži
             </button>
           </div>

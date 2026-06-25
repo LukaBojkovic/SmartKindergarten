@@ -7,6 +7,7 @@ import NotificationForm from "../components/notifications/NotificationForm";
 import NotificationsFilters from "../components/notifications/NotificationsFilters";
 import NotificationsList from "../components/notifications/NotificationsList";
 import { useAuth } from "../hooks/useAuth";
+import { FaPlus, FaSyncAlt } from "react-icons/fa";
 
 const initialForm = {
   title: "",
@@ -321,6 +322,7 @@ function NotificationsPage() {
               className="btn btn-primary"
               onClick={openCreateNotificationForm}
             >
+              <FaPlus className="me-2" />
               Novo obaveštenje
             </button>
           )}
@@ -330,6 +332,7 @@ function NotificationsPage() {
             onClick={loadNotifications}
             disabled={isLoadingNotifications}
           >
+            <FaSyncAlt className="me-2" />
             Osveži
           </button>
         </div>

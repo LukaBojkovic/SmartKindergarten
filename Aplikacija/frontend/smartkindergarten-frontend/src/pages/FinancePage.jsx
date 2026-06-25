@@ -8,6 +8,7 @@ import FinanceStatusCard from "../components/finance/FinanceStatusCard";
 import PaymentForm from "../components/finance/PaymentForm";
 import PaymentsTable from "../components/finance/PaymentsTable";
 import { useAuth } from "../hooks/useAuth";
+import { FaPlus, FaSyncAlt } from "react-icons/fa";
 
 const initialForm = {
   amount: "",
@@ -398,6 +399,7 @@ function FinancePage() {
               onClick={openCreatePaymentForm}
               disabled={!selectedChildId}
             >
+              <FaPlus className="me-2" />
               Evidentiraj uplatu
             </button>
           )}
@@ -407,6 +409,7 @@ function FinancePage() {
             onClick={loadFinance}
             disabled={!selectedChildId || isLoadingFinance}
           >
+            <FaSyncAlt className="me-2" />
             Osveži
           </button>
         </div>

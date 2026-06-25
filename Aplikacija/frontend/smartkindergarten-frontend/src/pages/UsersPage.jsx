@@ -5,6 +5,7 @@ import UserForm from "../components/users/UserForm";
 import UsersFilters from "../components/users/UsersFilters";
 import UsersTables from "../components/users/UsersTables";
 import ResetPasswordForm from "../components/users/ResetPasswordForm";
+import { FaSyncAlt } from "react-icons/fa";
 
 const USER_ROLES = [
   "Administrator",
@@ -316,6 +317,7 @@ const handleResetPasswordSubmit = async (event) => {
         </div>
 
         <button className="btn btn-outline-primary" onClick={loadUsers}>
+          <FaSyncAlt className="me-2" />
           Osveži
         </button>
       </div>

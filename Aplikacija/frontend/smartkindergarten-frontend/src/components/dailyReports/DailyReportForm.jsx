@@ -1,3 +1,4 @@
+import { FaPlus, FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
 import DatePickerInput from "../common/DatePickerInput";
 
 function DailyReportForm({
@@ -113,6 +114,7 @@ function DailyReportForm({
                     className="btn btn-sm btn-outline-danger"
                     onClick={onClearImage}
                   >
+                    <FaTrashAlt className="me-2" />
                     Ukloni sliku
                   </button>
                 </div>
@@ -126,6 +128,11 @@ function DailyReportForm({
               className="btn btn-primary"
               disabled={isSaving}
             >
+              {editingReportId ? (
+                <FaSave className="me-2" />
+              ) : (
+                <FaPlus className="me-2" />
+              )}
               {isSaving
                 ? "Čuvanje..."
                 : editingReportId
@@ -138,6 +145,7 @@ function DailyReportForm({
               className="btn btn-outline-secondary"
               onClick={onCancelEdit}
             >
+              <FaTimes className="me-2" />
               Otkaži
             </button>
           </div>

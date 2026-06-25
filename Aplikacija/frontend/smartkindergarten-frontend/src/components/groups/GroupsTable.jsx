@@ -1,3 +1,5 @@
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
+
 function GroupsTable({
   groups,
   isLoading,
@@ -71,6 +73,7 @@ function GroupsTable({
                             type="button"
                             onClick={() => onEdit(group)}
                           >
+                            <FaEdit className="me-2" />
                             Izmeni
                           </button>
                         </li>
@@ -85,6 +88,7 @@ function GroupsTable({
                             type="button"
                             onClick={() => onDelete(group)}
                           >
+                            <FaTrashAlt className="me-2" />
                             Obriši
                           </button>
                         </li>

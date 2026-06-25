@@ -1,3 +1,5 @@
+import { FaEdit, FaKey, FaTrashAlt } from "react-icons/fa";
+
 function UsersTables({ 
   users, 
   isLoading, 
@@ -64,6 +66,7 @@ function UsersTables({
                         type="button"
                         onClick={() => onEdit(user)}
                       >
+                        <FaEdit className="me-2" />
                         Izmeni
                       </button>
                     </li>
@@ -74,6 +77,7 @@ function UsersTables({
                         type="button"
                         onClick={() => onResetPassword(user)}
                       >
+                        <FaKey className="me-2" />
                         Reset lozinke
                       </button>
                     </li>
@@ -90,6 +94,7 @@ function UsersTables({
                           type="button"
                           onClick={() => onDeactivate(user)}
                         >
+                          <FaTrashAlt className="me-2" />
                           Deaktiviraj
                         </button>
                       </li>

@@ -1,3 +1,4 @@
+import { FaEdit, FaPlus, FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
 import DatePickerInput from "../common/DatePickerInput";
 import {
   developmentAreas,
@@ -100,6 +101,11 @@ function DevelopmentAssessmentsSection({
                 className="btn btn-primary"
                 disabled={isSaving}
               >
+                {editingAssessmentId ? (
+                  <FaSave className="me-2" />
+                ) : (
+                  <FaPlus className="me-2" />
+                )}
                 {editingAssessmentId ? "Sačuvaj izmenu" : "Dodaj procenu"}
               </button>
 
@@ -109,6 +115,7 @@ function DevelopmentAssessmentsSection({
                   className="btn btn-outline-secondary"
                   onClick={onCancelEditAssessment}
                 >
+                  <FaTimes className="me-2" />
                   Otkaži
                 </button>
               )}
@@ -159,6 +166,7 @@ function DevelopmentAssessmentsSection({
                         className="btn btn-sm btn-outline-primary me-2"
                         onClick={() => onStartEditAssessment(assessment)}
                       >
+                        <FaEdit className="me-2" />
                         Izmeni
                       </button>
 
@@ -166,6 +174,7 @@ function DevelopmentAssessmentsSection({
                         className="btn btn-sm btn-outline-danger"
                         onClick={() => onDeleteAssessment(assessment)}
                       >
+                        <FaTrashAlt className="me-2" />
                         Obriši
                       </button>
                     </td>

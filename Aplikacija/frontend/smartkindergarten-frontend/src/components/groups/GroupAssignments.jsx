@@ -1,3 +1,4 @@
+import { FaPlus, FaTrashAlt } from "react-icons/fa";
 import Select from "react-select";
 
 function GroupAssignments({
@@ -54,6 +55,7 @@ function GroupAssignments({
                   onClick={onAssignChild}
                   disabled={!selectedChildOption}
                 >
+                  <FaPlus className="me-2" />
                   Dodaj
                 </button>
               </div>
@@ -83,6 +85,7 @@ function GroupAssignments({
                       className="btn btn-sm btn-outline-danger"
                       onClick={() => onRemoveChild(child)}
                     >
+                      <FaTrashAlt className="me-2" />
                       Ukloni
                     </button>
                   )}
@@ -111,6 +114,7 @@ function GroupAssignments({
                   onClick={onAssignTeacher}
                   disabled={!selectedTeacherOption}
                 >
+                  <FaPlus className="me-2" />
                   Dodaj
                 </button>
               </div>
@@ -139,6 +143,7 @@ function GroupAssignments({
                       className="btn btn-sm btn-outline-danger"
                       onClick={() => onRemoveTeacher(teacher)}
                     >
+                      <FaTrashAlt className="me-2" />
                       Ukloni
                     </button>
                   )}

@@ -1,3 +1,5 @@
+import { FaPlus, FaSave, FaUndo } from "react-icons/fa";
+
 function UserForm({
   userRoles,
   editingUserId,
@@ -95,6 +97,7 @@ function UserForm({
               className="btn btn-primary w-100"
               disabled={isSaving}
             >
+              <FaPlus className="me-2" />
               {isSaving ? "Čuvanje..." : "Kreiraj korisnika"}
             </button>
           </form>
@@ -179,6 +182,7 @@ function UserForm({
               className="btn btn-success"
               disabled={isSaving}
             >
+              <FaSave className="me-2" />
               Sačuvaj izmene
             </button>
 
@@ -187,6 +191,7 @@ function UserForm({
               className="btn btn-outline-secondary"
               onClick={onCancelEdit}
             >
+              <FaUndo className="me-2" />
               Nazad na dodavanje
             </button>
           </div>

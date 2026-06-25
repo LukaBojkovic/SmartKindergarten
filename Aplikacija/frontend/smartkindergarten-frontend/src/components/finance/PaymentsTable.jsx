@@ -1,3 +1,5 @@
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
+
 function PaymentsTable({
   payments,
   isLoading,
@@ -65,6 +67,7 @@ function PaymentsTable({
                               type="button"
                               onClick={() => onStartEdit(payment)}
                             >
+                              <FaEdit className="me-2" />
                               Izmeni
                             </button>
                           </li>
@@ -79,6 +82,7 @@ function PaymentsTable({
                               type="button"
                               onClick={() => onDelete(payment)}
                             >
+                              <FaTrashAlt className="me-2" />
                               Obriši
                             </button>
                           </li>

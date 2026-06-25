@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaKey } from "react-icons/fa";
 import authApi from "../api/authApi";
 import { useAuth } from "../hooks/useAuth";
 
@@ -148,6 +149,7 @@ function AccountPage()
                   className="btn btn-primary"
                   disabled={isSaving}
                 >
+                  <FaKey className="me-2" />
                   {isSaving ? "Čuvanje..." : "Promeni lozinku"}
                 </button>
               </form>

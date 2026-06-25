@@ -5,6 +5,7 @@ import groupsApi from "../api/groupsApi";
 import AttendanceFilters from "../components/attendance/AttendanceFilters";
 import GroupAttendanceTable from "../components/attendance/GroupAttendanceTable";
 import { useAuth } from "../hooks/useAuth";
+import { FaSyncAlt } from "react-icons/fa";
 
 function AttendancePage() {
   const { user } = useAuth();
@@ -229,6 +230,7 @@ function AttendancePage() {
           onClick={loadAttendance}
           disabled={!selectedGroupId || isLoadingAttendance}
         >
+          <FaSyncAlt className="me-2" />
           Osveži
         </button>
       </div>

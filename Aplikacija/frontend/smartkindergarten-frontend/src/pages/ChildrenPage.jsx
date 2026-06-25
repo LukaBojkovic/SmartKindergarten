@@ -8,6 +8,7 @@ import ChildrenTable from "../components/children/ChildrenTable";
 import { useAuth } from "../hooks/useAuth";
 import usersApi from "../api/usersApi";
 import ChildParentsManager from "../components/children/ChildParentsManager";
+import { FaSyncAlt } from "react-icons/fa";
 
 const initialCreateForm = {
   firstName: "",
@@ -411,6 +412,7 @@ const parentOptions = parents
         </div>
 
         <button className="btn btn-outline-primary" onClick={loadChildren}>
+          <FaSyncAlt className="me-2" />
           Osveži
         </button>
       </div>

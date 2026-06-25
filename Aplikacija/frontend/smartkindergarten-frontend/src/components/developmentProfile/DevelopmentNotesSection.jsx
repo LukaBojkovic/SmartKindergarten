@@ -1,3 +1,5 @@
+import { FaEdit, FaPlus, FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
+
 function DevelopmentNotesSection({
   notes,
   canManage,
@@ -36,6 +38,11 @@ function DevelopmentNotesSection({
                 className="btn btn-primary"
                 disabled={isSaving}
               >
+                {editingNoteId ? (
+                  <FaSave className="me-2" />
+                ) : (
+                  <FaPlus className="me-2" />
+                )}
                 {editingNoteId ? "Sačuvaj izmenu" : "Dodaj belešku"}
               </button>
 
@@ -45,6 +52,7 @@ function DevelopmentNotesSection({
                   className="btn btn-outline-secondary"
                   onClick={onCancelEditNote}
                 >
+                  <FaTimes className="me-2" />
                   Otkaži
                 </button>
               )}
@@ -77,6 +85,7 @@ function DevelopmentNotesSection({
                       className="btn btn-sm btn-outline-primary"
                       onClick={() => onStartEditNote(note)}
                     >
+                      <FaEdit className="me-2" />
                       Izmeni
                     </button>
 
@@ -84,6 +93,7 @@ function DevelopmentNotesSection({
                       className="btn btn-sm btn-outline-danger"
                       onClick={() => onDeleteNote(note)}
                     >
+                      <FaTrashAlt className="me-2" />
                       Obriši
                     </button>
                   </div>

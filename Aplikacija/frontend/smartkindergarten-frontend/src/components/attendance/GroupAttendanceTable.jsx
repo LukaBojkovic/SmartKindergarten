@@ -1,3 +1,5 @@
+import { FaTrashAlt } from "react-icons/fa";
+
 function GroupAttendanceTable({
   attendance,
   isLoading,
@@ -109,6 +111,7 @@ function GroupAttendanceTable({
                             disabled={savingChildId === child.childId}
                             onClick={() => onDeleteAttendance(child)}
                           >
+                            <FaTrashAlt className="me-2" />
                             Obriši
                           </button>
                         )}

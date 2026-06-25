@@ -6,6 +6,7 @@ import DailyReportForm from "../components/dailyReports/DailyReportForm";
 import DailyReportsFilters from "../components/dailyReports/DailyReportsFilters";
 import DailyReportsList from "../components/dailyReports/DailyReportsList";
 import { useAuth } from "../hooks/useAuth";
+import { FaSyncAlt } from "react-icons/fa";
 
 const initialForm = {
   groupId: "",
@@ -212,6 +213,12 @@ const handleClearImage = () => {
     ...previousForm,
     imageUrl: "",
   }));
+
+  setTimeout(() => {
+    document
+      .getElementById("daily-report-form-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 0);
 };
 
   const handleSubmit = async (event) => {
@@ -263,7 +270,11 @@ const handleClearImage = () => {
     setError("");
     setSuccessMessage("");
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+     setTimeout(() => {
+    document
+      .getElementById("daily-report-form-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
   };
 
   const cancelEdit = () => {
@@ -332,6 +343,7 @@ const handleClearImage = () => {
           onClick={loadReports}
           disabled={isLoadingReports}
         >
+          <FaSyncAlt className="me-2" />
           Osveži
         </button>
       </div>
@@ -346,42 +358,55 @@ const handleClearImage = () => {
         <div className="alert alert-info">Učitavanje grupa...</div>
       )}
 
-      {(canCreate || editingReportId) && (
-        <DailyReportForm
-          groups={groups}
-          form={form}
-          editingReportId={editingReportId}
-          isSaving={isSaving}
-          canCreate={canCreate}
-          canEdit={Boolean(editingReportId)}
-          onChange={handleFormChange}
-          onImageChange={handleImageChange}
-          onClearImage={handleClearImage}
-          onSubmit={handleSubmit}
-          onCancelEdit={cancelEdit}
-        />
+      {editingReportId && (
+        <div className="alert alert-info">
+          U toku je izmena dnevnog izveštaja. Lista izveštaja je privremeno sakrivena
+          dok ne sačuvaš ili otkažeš izmenu.
+        </div>
       )}
 
-      <DailyReportsFilters
-        groups={groups}
-        groupFilter={groupFilter}
-        dateFilter={dateFilter}
-        searchFilter={searchFilter}
-        onGroupFilterChange={setGroupFilter}
-        onDateFilterChange={setDateFilter}
-        onSearchFilterChange={setSearchFilter}
-        onClearFilters={clearFilters}
-      />
+      {(canCreate || editingReportId) && (
+        <div id="daily-report-form-section">
+          <DailyReportForm
+            groups={groups}
+            form={form}
+            editingReportId={editingReportId}
+            isSaving={isSaving}
+            canCreate={canCreate}
+            canEdit={Boolean(editingReportId)}
+            onChange={handleFormChange}
+            onImageChange={handleImageChange}
+            onClearImage={handleClearImage}
+            onSubmit={handleSubmit}
+            onCancelEdit={cancelEdit}
+          />
+        </div>
+      )}
+      
+      {!editingReportId && (
+        <>
+        <DailyReportsFilters
+          groups={groups}
+          groupFilter={groupFilter}
+          dateFilter={dateFilter}
+          searchFilter={searchFilter}
+          onGroupFilterChange={setGroupFilter}
+          onDateFilterChange={setDateFilter}
+          onSearchFilterChange={setSearchFilter}
+          onClearFilters={clearFilters}
+        />
 
-      <DailyReportsList
-        reports={filteredReports}
-        isLoading={isLoadingReports}
-        getGroupName={getGroupName}
-        canEditReport={canEditReport}
-        canDeleteReport={canDeleteReport}
-        onStartEdit={startEdit}
-        onDelete={deleteReport}
-      />
+        <DailyReportsList
+          reports={filteredReports}
+          isLoading={isLoadingReports}
+          getGroupName={getGroupName}
+          canEditReport={canEditReport}
+          canDeleteReport={canDeleteReport}
+          onStartEdit={startEdit}
+          onDelete={deleteReport}
+        />
+      </>
+    )}
     </div>
   );
 }

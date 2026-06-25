@@ -1,3 +1,4 @@
+import { FaPlus, FaSave, FaTimes } from "react-icons/fa";
 import DatePickerInput from "../common/DatePickerInput";
 
 function PaymentForm({
@@ -79,6 +80,11 @@ function PaymentForm({
               className="btn btn-primary"
               disabled={isSaving || !selectedChildOption}
             >
+              {editingPaymentId ? (
+                <FaSave className="me-2" />
+              ) : (
+                <FaPlus className="me-2" />
+              )}
               {isSaving
                 ? "Čuvanje..."
                 : editingPaymentId
@@ -92,6 +98,7 @@ function PaymentForm({
                 className="btn btn-outline-secondary"
                 onClick={onCancelEdit}
               >
+                <FaTimes className="me-2" />
                 Otkaži
               </button>
             )}

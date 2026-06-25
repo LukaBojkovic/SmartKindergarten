@@ -1,3 +1,4 @@
+import { FaPlus, FaSave, FaUndo } from "react-icons/fa";
 import DatePickerInput from "../common/DatePickerInput";
 
 function ChildForm({
@@ -85,6 +86,7 @@ function ChildForm({
               className="btn btn-primary w-100"
               disabled={isSaving}
             >
+              <FaPlus className="me-2" />
               {isSaving ? "Čuvanje..." : "Kreiraj dete"}
             </button>
           </form>
@@ -179,6 +181,7 @@ function ChildForm({
               className="btn btn-success"
               disabled={isSaving}
             >
+              <FaSave className="me-2" />
               Sačuvaj izmene
             </button>
 
@@ -187,6 +190,7 @@ function ChildForm({
               className="btn btn-outline-secondary"
               onClick={onCancelEdit}
             >
+              <FaUndo className="me-2" />
               Nazad na dodavanje
             </button>
           </div>
