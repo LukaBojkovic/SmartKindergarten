@@ -8,6 +8,8 @@ import NotificationsFilters from "../components/notifications/NotificationsFilte
 import NotificationsList from "../components/notifications/NotificationsList";
 import { useAuth } from "../hooks/useAuth";
 import { FaPlus, FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useConfirm } from "../hooks/useConfirm";
 
 const initialForm = {
   title: "",
@@ -16,6 +18,7 @@ const initialForm = {
 
 function NotificationsPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
 
   const [notifications, setNotifications] = useState([]);
   const [recipientOptions, setRecipientOptions] = useState([]);
@@ -37,7 +40,6 @@ function NotificationsPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const currentUserId = getCurrentUserId(user);
   const isAdmin = user?.role === "Administrator";
@@ -161,7 +163,6 @@ function NotificationsPage() {
 
   setIsNotificationFormVisible(true);
   setError("");
-  setSuccessMessage("");
 
   setTimeout(() => {
     document
@@ -184,7 +185,6 @@ function NotificationsPage() {
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try {
       if (editingNotificationId) {
@@ -193,7 +193,7 @@ function NotificationsPage() {
           content: form.content,
         });
 
-        setSuccessMessage("Obaveštenje je uspešno izmenjeno.");
+        toast.success("Obaveštenje je uspešno izmenjeno.");
       } else {
         await notificationsApi.create({
           title: form.title,
@@ -202,14 +202,14 @@ function NotificationsPage() {
             (recipient) => recipient.value
           ),
         });
-        setSuccessMessage("Obaveštenje je uspešno poslato.");
+        toast.success("Obaveštenje je uspešno poslato.");
       }
 
       resetForm();
       setIsNotificationFormVisible(false);
       await loadNotifications();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } finally {
       setIsSaving(false);
     }
@@ -232,7 +232,6 @@ function NotificationsPage() {
 
     setIsNotificationFormVisible(true);
     setError("");
-    setSuccessMessage("");
 
     setTimeout(() => {
     document
@@ -248,37 +247,37 @@ function NotificationsPage() {
 
   const markAsRead = async (notification) => {
     setError("");
-    setSuccessMessage("");
 
     try {
       await notificationsApi.markAsRead(notification.id);
 
-      setSuccessMessage("Obaveštenje je označeno kao pročitano.");
+      toast.success("Obaveštenje je označeno kao pročitano.");
       await loadNotifications();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
   const deleteNotification = async (notification) => {
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da obrišeš obaveštenje "${notification.title}"?`
-    );
+    const confirmed = await confirm({
+      title: "Brisanje obaveštenja",
+      message: `Da li sigurno želiš da obrišeš obaveštenje "${notification.title}"?`,
+      confirmText: "Obriši",
+    });
 
     if (!confirmed) {
       return;
     }
 
     setError("");
-    setSuccessMessage("");
 
     try {
       await notificationsApi.delete(notification.id);
 
-      setSuccessMessage("Obaveštenje je obrisano.");
+      toast.success("Obaveštenje je obrisano.");
       await loadNotifications();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -339,10 +338,6 @@ function NotificationsPage() {
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
 
      {canSend && isNotificationFormVisible && (
         <div id="notification-form-section">

@@ -1,7 +1,14 @@
 import { useState } from "react";
-import { FaKey } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaIdBadge,
+  FaKey,
+  FaShieldAlt,
+  FaUser,
+} from "react-icons/fa";
 import authApi from "../api/authApi";
 import { useAuth } from "../hooks/useAuth";
+import { toast } from "react-toastify";
 
 const initialForm = {
   currentPassword: "",
@@ -12,12 +19,13 @@ const initialForm = {
 function AccountPage()
  {
   const { user } = useAuth();
+  const fullName = getFullName(user);
+  const userInitials = getUserInitials(user);
 
   const [form, setForm] = useState(initialForm);
   const [isSaving, setIsSaving] = useState(false);
 
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -33,14 +41,13 @@ function AccountPage()
 
     if (form.newPassword !== form.confirmPassword)
     {
-      setError("Nova lozinka i potvrda lozinke se ne poklapaju.");
-      setSuccessMessage("");
+      setError("");
+      toast.error("Nova lozinka i potvrda lozinke se ne poklapaju.");
       return;
     }
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try 
     {
@@ -49,12 +56,12 @@ function AccountPage()
         newPassword: form.newPassword,
       });
 
-      setSuccessMessage(responseMessage || "Lozinka je uspešno promenjena.");
+      toast.success(responseMessage || "Lozinka je uspešno promenjena.");
       setForm(initialForm);
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } 
     finally 
     {
@@ -71,32 +78,65 @@ function AccountPage()
 
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
-
-      <div className="row g-4">
-        <div className="col-lg-5">
-          <div className="card shadow-sm">
+      <div className="row g-4 align-items-start">
+        <div className="col-lg-4">
+          <div className="card shadow-sm account-profile-card">
             <div className="card-body">
-              <h5 className="card-title">Podaci o korisniku</h5>
+              <div className="text-center">
+                <div className="account-avatar mx-auto">
+                  {userInitials}
+                </div>
 
-              <p className="mb-1">
-                <strong>Ime i prezime:</strong> {user?.fullName}
-              </p>
+                <h5 className="account-profile-name">{fullName}</h5>
 
-              <p className="mb-1">
-                <strong>Korisničko ime:</strong> {user?.username}
-              </p>
+                {user?.role && (
+                  <span className="badge bg-success">{user.role}</span>
+                )}
+              </div>
 
-              <p className="mb-0">
-                <strong>Uloga:</strong> {user?.role}
-              </p>
+              <div className="account-detail-list">
+                <div className="account-detail-item">
+                  <span className="account-detail-icon">
+                    <FaUser />
+                  </span>
+
+                  <div>
+                    <span className="account-detail-label">
+                      Korisničko ime
+                    </span>
+                    <strong>{user?.username || "-"}</strong>
+                  </div>
+                </div>
+
+                <div className="account-detail-item">
+                  <span className="account-detail-icon">
+                    <FaIdBadge />
+                  </span>
+
+                  <div>
+                    <span className="account-detail-label">Uloga</span>
+                    <strong>{user?.role || "-"}</strong>
+                  </div>
+                </div>
+
+                {user?.email && (
+                  <div className="account-detail-item">
+                    <span className="account-detail-icon">
+                      <FaEnvelope />
+                    </span>
+
+                    <div>
+                      <span className="account-detail-label">Email</span>
+                      <strong>{user.email}</strong>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="col-lg-7">
+        <div className="col-lg-8">
           <div className="card shadow-sm">
             <div className="card-body">
               <h5 className="card-title">Promena lozinke</h5>
@@ -153,12 +193,44 @@ function AccountPage()
                   {isSaving ? "Čuvanje..." : "Promeni lozinku"}
                 </button>
               </form>
+
+              <div className="alert alert-secondary d-flex align-items-center gap-2 mt-3 mb-0">
+                <FaShieldAlt />
+                <span>
+                  Lozinku čuvajte poverljivo i ne delite je sa drugim korisnicima.
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function getFullName(user) {
+  const fullName = user?.fullName?.trim();
+
+  if (fullName)
+    return fullName;
+
+  const nameParts = [user?.firstName, user?.lastName].filter(Boolean);
+
+  if (nameParts.length > 0)
+    return nameParts.join(" ");
+
+  return user?.username || "Korisnik";
+}
+
+function getUserInitials(user) {
+  const fullName = getFullName(user);
+  const nameParts = fullName.split(" ").filter(Boolean);
+
+  if (nameParts.length >= 2) {
+    return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+  }
+
+  return fullName.slice(0, 2).toUpperCase();
 }
 
 function getErrorMessage(error) 

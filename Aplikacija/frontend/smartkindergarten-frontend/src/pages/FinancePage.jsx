@@ -9,6 +9,8 @@ import PaymentForm from "../components/finance/PaymentForm";
 import PaymentsTable from "../components/finance/PaymentsTable";
 import { useAuth } from "../hooks/useAuth";
 import { FaPlus, FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useConfirm } from "../hooks/useConfirm";
 
 const initialForm = {
   amount: "",
@@ -20,6 +22,7 @@ const MONTHLY_FEE_KEY = "MonthlyFee";
 
 function FinancePage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
 
   const [childrenList, setChildrenList] = useState([]);
   const [selectedChildOption, setSelectedChildOption] = useState(null);
@@ -41,7 +44,6 @@ function FinancePage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const canManage =
     user?.role === "Administrator" || user?.role === "AdministrativeStaff";
@@ -261,7 +263,6 @@ function FinancePage() {
 
   setIsPaymentFormVisible(true);
   setError("");
-  setSuccessMessage("");
 
   setTimeout(() => {
     document
@@ -294,27 +295,26 @@ function FinancePage() {
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try {
       if (editingPaymentId) {
         await paymentsApi.update(editingPaymentId, paymentData);
 
-        setSuccessMessage("Uplata je uspešno ažurirana.");
+        toast.success("Uplata je uspešno ažurirana.");
       } else {
         await paymentsApi.create({
           ...paymentData,
           childId: selectedChildId,
         });
 
-        setSuccessMessage("Uplata je uspešno evidentirana.");
+        toast.success("Uplata je uspešno evidentirana.");
       }
 
       resetForm();
       setIsPaymentFormVisible(false);
       await loadFinance();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } finally {
       setIsSaving(false);
     }
@@ -331,7 +331,6 @@ function FinancePage() {
 
     setIsPaymentFormVisible(true);
     setError("");
-    setSuccessMessage("");
 
     setTimeout(() => {
     document
@@ -346,24 +345,25 @@ function FinancePage() {
   };
 
   const deletePayment = async (payment) => {
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da obrišeš uplatu za ${payment.childFullName}?`
-    );
+    const confirmed = await confirm({
+      title: "Brisanje uplate",
+      message: `Da li sigurno želiš da obrišeš uplatu za ${payment.childFullName}?`,
+      confirmText: "Obriši",
+    });
 
     if (!confirmed) {
       return;
     }
 
     setError("");
-    setSuccessMessage("");
 
     try {
       await paymentsApi.delete(payment.id);
 
-      setSuccessMessage("Uplata je obrisana.");
+      toast.success("Uplata je obrisana.");
       await loadFinance();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -416,10 +416,6 @@ function FinancePage() {
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
 
       <FinanceFilters
         childOptions={childOptions}

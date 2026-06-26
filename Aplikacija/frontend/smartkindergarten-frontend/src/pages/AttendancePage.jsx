@@ -6,9 +6,12 @@ import AttendanceFilters from "../components/attendance/AttendanceFilters";
 import GroupAttendanceTable from "../components/attendance/GroupAttendanceTable";
 import { useAuth } from "../hooks/useAuth";
 import { FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useConfirm } from "../hooks/useConfirm";
 
 function AttendancePage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
 
   const [groups, setGroups] = useState([]);
   const [selectedGroupOption, setSelectedGroupOption] = useState(null);
@@ -21,7 +24,6 @@ function AttendancePage() {
   const [savingChildId, setSavingChildId] = useState(null);
 
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const canManage =
     user?.role === "Administrator" || user?.role === "Teacher";
@@ -142,12 +144,10 @@ function AttendancePage() {
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
-    setSuccessMessage("");
   };
 
   const handleGroupChange = (option) => {
     setSelectedGroupOption(option);
-    setSuccessMessage("");
   };
 
   const handleSaveAttendance = async (child, isPresent) => {
@@ -157,7 +157,6 @@ function AttendancePage() {
 
     setSavingChildId(child.childId);
     setError("");
-    setSuccessMessage("");
 
     const attendanceData = {
       childId: child.childId,
@@ -171,16 +170,16 @@ function AttendancePage() {
           isPresent,
         });
 
-        setSuccessMessage("Prisustvo je uspešno ažurirano.");
+        toast.success("Prisustvo je uspešno ažurirano.");
       } else {
         await attendanceApi.create(attendanceData);
 
-        setSuccessMessage("Prisustvo je uspešno evidentirano.");
+        toast.success("Prisustvo je uspešno evidentirano.");
       }
 
       await loadAttendance();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } finally {
       setSavingChildId(null);
     }
@@ -191,9 +190,11 @@ function AttendancePage() {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da obrišeš evidenciju prisustva za ${child.childFullName}?`
-    );
+    const confirmed = await confirm({
+      title: "Brisanje evidencije prisustva",
+      message: `Da li sigurno želiš da obrišeš evidenciju prisustva za ${child.childFullName}?`,
+      confirmText: "Obriši",
+    });
 
     if (!confirmed) {
       return;
@@ -201,15 +202,14 @@ function AttendancePage() {
 
     setSavingChildId(child.childId);
     setError("");
-    setSuccessMessage("");
 
     try {
       await attendanceApi.delete(child.attendanceId);
 
-      setSuccessMessage("Evidencija prisustva je obrisana.");
+      toast.success("Evidencija prisustva je obrisana.");
       await loadAttendance();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } finally {
       setSavingChildId(null);
     }
@@ -236,10 +236,6 @@ function AttendancePage() {
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
 
       <AttendanceFilters
         groupOptions={groupOptions}

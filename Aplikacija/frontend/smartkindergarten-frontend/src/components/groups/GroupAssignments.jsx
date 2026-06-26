@@ -1,4 +1,4 @@
-import { FaPlus, FaTrashAlt } from "react-icons/fa";
+import { FaPlus, FaTrashAlt, FaUsersSlash } from "react-icons/fa";
 import Select from "react-select";
 
 function GroupAssignments({
@@ -13,6 +13,7 @@ function GroupAssignments({
   onAssignChild,
   onAssignTeacher,
   onRemoveChild,
+  onRemoveAllChildren,
   onRemoveTeacher,
 }) 
 {
@@ -92,6 +93,19 @@ function GroupAssignments({
                 </li>
               ))}
             </ul>
+
+            {canManage && group.children.length > 0 && (
+              <div className="d-flex justify-content-end mt-2">
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  type="button"
+                  onClick={onRemoveAllChildren}
+                >
+                  <FaUsersSlash className="me-2" />
+                  Isprazni grupu
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="col-lg-6">

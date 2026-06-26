@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { FaSave } from "react-icons/fa";
 import systemSettingsApi from "../api/systemSettingsApi";
 import { useAuth } from "../hooks/useAuth";
+import { toast } from "react-toastify";
 
 const MONTHLY_FEE_KEY = "MonthlyFee";
 const KINDERGARTEN_NAME_KEY = "KindergartenName";
@@ -21,14 +22,12 @@ function SystemSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const canManage = user?.role === "Administrator";
 
   const loadSettings = async () => {
     setIsLoading(true);
     setError("");
-    setSuccessMessage("");
 
     try {
       await Promise.all([loadMonthlyFee(), loadKindergartenName()]);
@@ -85,20 +84,19 @@ function SystemSettingsPage() {
     const parsedMonthlyFee = Number(monthlyFee);
 
     if (!trimmedKindergartenName) {
-      setError("Naziv ustanove je obavezan.");
-      setSuccessMessage("");
+      setError("");
+      toast.error("Naziv ustanove je obavezan.");
       return;
     }
 
     if (Number.isNaN(parsedMonthlyFee) || parsedMonthlyFee <= 0) {
-      setError("Mesečna članarina mora biti pozitivan broj.");
-      setSuccessMessage("");
+      setError("");
+      toast.error("Mesečna članarina mora biti pozitivan broj.");
       return;
     }
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try {
       const savedKindergartenName = await saveSetting({
@@ -121,10 +119,10 @@ function SystemSettingsPage() {
       setMonthlyFeeSettingId(savedMonthlyFee.id);
       setMonthlyFee(savedMonthlyFee.value);
 
-      setSuccessMessage("Sistemska podešavanja su uspešno sačuvana.");
+      toast.success("Sistemska podešavanja su uspešno sačuvana.");
       window.dispatchEvent(new Event("system-settings:updated"));
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } finally {
       setIsSaving(false);
     }
@@ -166,10 +164,6 @@ function SystemSettingsPage() {
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
 
       {isLoading ? (
         <div className="alert alert-info">

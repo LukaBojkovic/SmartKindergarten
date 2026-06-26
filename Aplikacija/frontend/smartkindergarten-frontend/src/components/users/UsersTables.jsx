@@ -12,8 +12,17 @@ function UsersTables({
     return <div className="alert alert-info">Učitavanje korisnika...</div>;
 
   return (
-    <div className="table-responsive">
+    <div className="table-responsive users-table-wrapper">
       <table className="table table-striped table-hover align-middle users-table">
+        <colgroup>
+          <col className="users-table-username" />
+          <col className="users-table-name" />
+          <col className="users-table-email" />
+          <col className="users-table-role" />
+          <col className="users-table-status" />
+          <col className="users-table-actions" />
+        </colgroup>
+
         <thead>
           <tr>
             <th>Korisničko ime</th>
@@ -36,12 +45,12 @@ function UsersTables({
 
           {users.map((user) => (
             <tr key={user.id}>
-              <td>{user.username}</td>
-              <td>
+              <td title={user.username}>{user.username}</td>
+              <td title={`${user.firstName} ${user.lastName}`}>
                 {user.firstName} {user.lastName}
               </td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
+              <td title={user.email}>{user.email}</td>
+              <td title={user.role}>{user.role}</td>
               <td>
                 {user.isActive ? (
                   <span className="badge bg-success">Aktivan</span>

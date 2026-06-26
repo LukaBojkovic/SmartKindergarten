@@ -7,6 +7,8 @@ import DailyReportsFilters from "../components/dailyReports/DailyReportsFilters"
 import DailyReportsList from "../components/dailyReports/DailyReportsList";
 import { useAuth } from "../hooks/useAuth";
 import { FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useConfirm } from "../hooks/useConfirm";
 
 const initialForm = {
   groupId: "",
@@ -26,6 +28,7 @@ const ALLOWED_IMAGE_TYPES = [
 
 function DailyReportsPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
 
   const [reports, setReports] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -42,7 +45,6 @@ function DailyReportsPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const canCreate = user?.role === "Teacher";
   const currentUserId = user?.id ?? user?.userId;
@@ -181,13 +183,15 @@ function DailyReportsPage() {
   }
 
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    setError("Dozvoljeni formati slike su JPG, PNG i WEBP.");
+    setError("");
+    toast.error("Dozvoljeni formati slike su JPG, PNG i WEBP.");
     event.target.value = "";
     return;
   }
 
   if (file.size > MAX_IMAGE_SIZE_BYTES) {
-    setError("Slika je prevelika. Maksimalna veličina slike je 500 KB.");
+    setError("");
+    toast.error("Slika je prevelika. Maksimalna veličina slike je 500 KB.");
     event.target.value = "";
     return;
   }
@@ -202,7 +206,8 @@ function DailyReportsPage() {
 
     setError("");
   } catch {
-    setError("Došlo je do greške pri učitavanju slike.");
+    setError("");
+    toast.error("Došlo je do greške pri učitavanju slike.");
   } finally {
     event.target.value = "";
   }
@@ -234,23 +239,22 @@ const handleClearImage = () => {
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try {
       if (editingReportId) {
         await dailyReportsApi.update(editingReportId, reportData);
 
-        setSuccessMessage("Dnevni izveštaj je uspešno ažuriran.");
+        toast.success("Dnevni izveštaj je uspešno ažuriran.");
       } else {
         await dailyReportsApi.create(reportData);
 
-        setSuccessMessage("Dnevni izveštaj je uspešno kreiran.");
+        toast.success("Dnevni izveštaj je uspešno kreiran.");
       }
 
       resetForm();
       await loadReports();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } finally {
       setIsSaving(false);
     }
@@ -268,7 +272,6 @@ const handleClearImage = () => {
     });
 
     setError("");
-    setSuccessMessage("");
 
      setTimeout(() => {
     document
@@ -282,24 +285,25 @@ const handleClearImage = () => {
   };
 
   const deleteReport = async (report) => {
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da obrišeš dnevni izveštaj "${report.title}"?`
-    );
+    const confirmed = await confirm({
+      title: "Brisanje dnevnog izveštaja",
+      message: `Da li sigurno želiš da obrišeš dnevni izveštaj "${report.title}"?`,
+      confirmText: "Obriši",
+    });
 
     if (!confirmed) {
       return;
     }
 
     setError("");
-    setSuccessMessage("");
 
     try {
       await dailyReportsApi.delete(report.id);
 
-      setSuccessMessage("Dnevni izveštaj je obrisan.");
+      toast.success("Dnevni izveštaj je obrisan.");
       await loadReports();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -349,10 +353,6 @@ const handleClearImage = () => {
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
 
       {isLoadingGroups && (
         <div className="alert alert-info">Učitavanje grupa...</div>

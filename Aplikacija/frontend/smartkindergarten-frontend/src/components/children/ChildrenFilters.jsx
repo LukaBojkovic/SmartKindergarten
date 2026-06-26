@@ -1,3 +1,5 @@
+import { FaSearch } from "react-icons/fa";
+
 function ChildrenFilters({
   groups,
   searchFilter,
@@ -12,12 +14,17 @@ function ChildrenFilters({
     <div className="d-flex flex-column flex-md-row gap-3 mb-3">
       <div className="flex-fill">
         <label className="form-label">Pretraga</label>
-        <input
-          className="form-control"
-          value={searchFilter}
-          onChange={(event) => onSearchFilterChange(event.target.value)}
-          placeholder="Ime ili prezime deteta"
-        />
+        <div className="input-group">
+          <span className="input-group-text">
+            <FaSearch />
+          </span>
+          <input
+            className="form-control"
+            value={searchFilter}
+            onChange={(event) => onSearchFilterChange(event.target.value)}
+            placeholder="Ime ili prezime deteta"
+          />
+        </div>
       </div>
 
       <div className="flex-fill">

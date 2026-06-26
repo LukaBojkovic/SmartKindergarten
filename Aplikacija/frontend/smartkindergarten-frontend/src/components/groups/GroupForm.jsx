@@ -84,10 +84,10 @@ function GroupForm({
             />
           </div>
 
-          <div className="d-flex gap-2">
+          <div className="d-flex flex-column flex-xl-row gap-2">
             <button
               type="submit"
-              className="btn btn-success"
+              className="btn btn-success flex-fill text-nowrap"
               disabled={isSaving}
             >
               <FaSave className="me-2" />
@@ -96,7 +96,7 @@ function GroupForm({
 
             <button
               type="button"
-              className="btn btn-outline-secondary"
+              className="btn btn-outline-secondary flex-fill text-nowrap"
               onClick={onCancelEdit}
             >
               <FaUndo className="me-2" />

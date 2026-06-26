@@ -1,11 +1,13 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import usersApi from "../api/usersApi";
 import UserForm from "../components/users/UserForm";
 import UsersFilters from "../components/users/UsersFilters";
 import UsersTables from "../components/users/UsersTables";
 import ResetPasswordForm from "../components/users/ResetPasswordForm";
 import { FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useConfirm } from "../hooks/useConfirm";
 
 const USER_ROLES = [
   "Administrator",
@@ -38,9 +40,11 @@ const initialResetPasswordForm = {
 
 function UsersPage()
  {
+  const confirm = useConfirm();
   const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
-  const [activeFilter, setActiveFilter] = useState("true");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const [createForm, setCreateForm] = useState(initialCreateForm);
   const [editForm, setEditForm] = useState(initialEditForm);
@@ -49,7 +53,6 @@ function UsersPage()
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const [resetPasswordUser, setResetPasswordUser] = useState(null);
   const [resetPasswordForm, setResetPasswordForm] = 
@@ -64,8 +67,8 @@ function UsersPage()
 
     usersApi
       .getAll({
-        role: roleFilter,
-        isActive: activeFilter,
+        role: "",
+        isActive: "",
       })
       .then((data) => {
         if (!isCancelled) {
@@ -87,7 +90,7 @@ function UsersPage()
     return () => {
       isCancelled = true;
     };
-  }, [roleFilter, activeFilter]);
+  }, []);
 
   const loadUsers = async () => {
     setIsLoading(true);
@@ -96,8 +99,8 @@ function UsersPage()
     try 
     {
       const data = await usersApi.getAll({
-        role: roleFilter,
-        isActive: activeFilter,
+        role: "",
+        isActive: "",
       });
 
       setUsers(data);
@@ -135,20 +138,19 @@ function UsersPage()
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       await usersApi.create(createForm);
 
       setCreateForm(initialCreateForm);
-      setSuccessMessage("Korisnik je uspešno kreiran.");
+      toast.success("Korisnik je uspešno kreiran.");
 
       await loadUsers();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } 
     finally 
     {
@@ -170,7 +172,6 @@ function UsersPage()
     });
 
     setError("");
-    setSuccessMessage("");
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -188,7 +189,6 @@ function UsersPage()
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try 
     {
@@ -196,13 +196,13 @@ function UsersPage()
 
       setEditingUserId(null);
       setEditForm(initialEditForm);
-      setSuccessMessage("Korisnik je uspešno ažuriran.");
+      toast.success("Korisnik je uspešno ažuriran.");
 
       await loadUsers();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } finally 
     {
       setIsSaving(false);
@@ -210,26 +210,27 @@ function UsersPage()
   };
 
   const handleDeactivate = async (user) => {
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da deaktiviraš korisnika ${user.username}?`
-    );
+    const confirmed = await confirm({
+      title: "Deaktivacija korisnika",
+      message: `Da li sigurno želiš da deaktiviraš korisnika ${user.username}?`,
+      confirmText: "Deaktiviraj",
+    });
 
     if (!confirmed)
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try
     {
       await usersApi.deactivate(user.id);
 
-      setSuccessMessage("Korisnik je deaktiviran.");
+      toast.success("Korisnik je deaktiviran.");
       await loadUsers();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -241,7 +242,6 @@ function UsersPage()
     setResetPasswordForm(initialResetPasswordForm);
 
     setError("");
-    setSuccessMessage("");
 
     window.scrollTo({ top: 0, behavior: "smooth" });
 };
@@ -260,7 +260,7 @@ const handleResetPasswordChange = (event) => {
   }));
 };
 
-const handleResetPasswordSubmit = async (event) => {
+  const handleResetPasswordSubmit = async (event) => {
   event.preventDefault();
 
   if (!resetPasswordUser)
@@ -268,28 +268,27 @@ const handleResetPasswordSubmit = async (event) => {
 
   if (resetPasswordForm.newPassword !== resetPasswordForm.confirmPassword)
   {
-    setError("Nova lozinka i potvrda lozinke se ne poklapaju.");
-    setSuccessMessage("");
+    setError("");
+    toast.error("Nova lozinka i potvrda lozinke se ne poklapaju.");
     return;
   }
 
   if (resetPasswordForm.newPassword.length < 6) 
   {
-    setError("Nova lozinka mora imati najmanje 6 karaktera.");
-    setSuccessMessage("");
+    setError("");
+    toast.error("Nova lozinka mora imati najmanje 6 karaktera.");
     return;
   }
 
   setIsResetPasswordSaving(true);
   setError("");
-  setSuccessMessage("");
 
   try 
   {
     await usersApi
     .resetPassword(resetPasswordUser.id, resetPasswordForm.newPassword);
 
-    setSuccessMessage(
+    toast.success(
       `Lozinka za korisnika ${resetPasswordUser.username} je uspešno resetovana.`
     );
 
@@ -298,13 +297,47 @@ const handleResetPasswordSubmit = async (event) => {
   } 
   catch (requestError) 
   {
-    setError(getErrorMessage(requestError));
+    toast.error(getErrorMessage(requestError));
   } 
   finally 
   {
     setIsResetPasswordSaving(false);
   }
 };
+
+  const filteredUsers = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return users.filter((user) => {
+      const fullName = user.fullName || `${user.firstName || ""} ${user.lastName || ""}`;
+      const searchableText = [
+        fullName,
+        user.username,
+        user.email,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      const matchesSearch =
+        !normalizedSearch || searchableText.includes(normalizedSearch);
+
+      const matchesRole = !roleFilter || user.role === roleFilter;
+
+      const matchesStatus =
+        !statusFilter ||
+        (Object.prototype.hasOwnProperty.call(user, "isActive") &&
+          String(user.isActive) === statusFilter);
+
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, searchTerm, roleFilter, statusFilter]);
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setRoleFilter("");
+    setStatusFilter("");
+  };
 
   return (
     <div className="container mt-4">
@@ -323,10 +356,6 @@ const handleResetPasswordSubmit = async (event) => {
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
 
       <div className="row g-4 align-items-start">
         <div className="col-lg-4">
@@ -356,18 +385,25 @@ const handleResetPasswordSubmit = async (event) => {
       </div>
 
         <div className="col-lg-8">
+          <UsersFilters
+            userRoles={USER_ROLES}
+            searchTerm={searchTerm}
+            roleFilter={roleFilter}
+            statusFilter={statusFilter}
+            onSearchTermChange={setSearchTerm}
+            onRoleFilterChange={setRoleFilter}
+            onStatusFilterChange={setStatusFilter}
+            onClearFilters={clearFilters}
+          />
+
           <div className="card shadow-sm">
             <div className="card-body">
-              <UsersFilters
-                userRoles={USER_ROLES}
-                roleFilter={roleFilter}
-                activeFilter={activeFilter}
-                onRoleFilterChange={setRoleFilter}
-                onActiveFilterChange={setActiveFilter}
-              />
+              <p className="text-muted mb-3">
+                Prikazano: {filteredUsers.length} od {users.length} korisnika
+              </p>
 
               <UsersTables
-                users={users}
+                users={filteredUsers}
                 isLoading={isLoading}
                 onEdit={startEdit}
                 onDeactivate={handleDeactivate}

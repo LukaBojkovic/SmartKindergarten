@@ -9,6 +9,8 @@ import DevelopmentProgressChart from "../components/developmentProfile/Developme
 import { developmentAreas } from "../constants/developmentAreas";
 import { useAuth } from "../hooks/useAuth";
 import { FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useConfirm } from "../hooks/useConfirm";
 
 const initialNoteForm = {
   content: "",
@@ -24,6 +26,7 @@ const initialAssessmentForm = {
 function DevelopmentProfilePage()
 {
   const { user } = useAuth();
+  const confirm = useConfirm();
 
   const [childrenList, setChildrenList] = useState([]);
   const [selectedChildOption, setSelectedChildOption] = useState(null);
@@ -45,7 +48,6 @@ function DevelopmentProfilePage()
   const [isSaving, setIsSaving] = useState(false);
 
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const canManage = user?.role === "Teacher";
   const selectedChildId = selectedChildOption?.value;
@@ -187,19 +189,18 @@ function DevelopmentProfilePage()
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       if (editingNoteId) 
         {
         await developmentProfilesApi.updateNote(editingNoteId, noteForm);
-        setSuccessMessage("Beleška je uspešno izmenjena.");
+        toast.success("Beleška je uspešno izmenjena.");
         } 
       else 
         {
         await developmentProfilesApi.createNote(selectedChildId, noteForm);
-        setSuccessMessage("Beleška je uspešno dodata.");
+        toast.success("Beleška je uspešno dodata.");
         }
 
       setNoteForm(initialNoteForm);
@@ -209,7 +210,7 @@ function DevelopmentProfilePage()
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } 
     finally 
     {
@@ -224,7 +225,6 @@ function DevelopmentProfilePage()
     });
 
     setError("");
-    setSuccessMessage("");
   };
 
   const cancelEditNote = () => {
@@ -233,24 +233,27 @@ function DevelopmentProfilePage()
   };
 
   const deleteNote = async (note) => {
-    const confirmed = window.confirm("Da li sigurno želiš da obrišeš belešku?");
+    const confirmed = await confirm({
+      title: "Brisanje beleške",
+      message: "Da li sigurno želiš da obrišeš belešku?",
+      confirmText: "Obriši",
+    });
 
     if (!confirmed)
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       await developmentProfilesApi.deleteNote(note.id);
 
-      setSuccessMessage("Beleška je obrisana.");
+      toast.success("Beleška je obrisana.");
       await loadProfile();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -289,7 +292,6 @@ function DevelopmentProfilePage()
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try 
     {
@@ -298,14 +300,14 @@ function DevelopmentProfilePage()
         await developmentProfilesApi
         .updateAssessment(editingAssessmentId,assessmentData);
 
-        setSuccessMessage("Procena je uspešno izmenjena.");
+        toast.success("Procena je uspešno izmenjena.");
         } 
       else 
         {
         await developmentProfilesApi
         .createAssessment(selectedChildId, assessmentData);
 
-        setSuccessMessage("Procena je uspešno dodata.");
+        toast.success("Procena je uspešno dodata.");
         }
 
       setAssessmentForm({
@@ -319,7 +321,7 @@ function DevelopmentProfilePage()
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } 
     finally 
     {
@@ -338,7 +340,6 @@ function DevelopmentProfilePage()
 
     setSelectedArea(assessment.area);
     setError("");
-    setSuccessMessage("");
   };
 
   const cancelEditAssessment = () => {
@@ -351,26 +352,27 @@ function DevelopmentProfilePage()
   };
 
   const deleteAssessment = async (assessment) => {
-    const confirmed = window.confirm(
-      "Da li sigurno želiš da obrišeš procenu razvoja?"
-    );
+    const confirmed = await confirm({
+      title: "Brisanje procene razvoja",
+      message: "Da li sigurno želiš da obrišeš procenu razvoja?",
+      confirmText: "Obriši",
+    });
 
     if (!confirmed)
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       await developmentProfilesApi.deleteAssessment(assessment.id);
 
-      setSuccessMessage("Procena je obrisana.");
+      toast.success("Procena je obrisana.");
       await loadProfile();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -397,10 +399,6 @@ function DevelopmentProfilePage()
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
 
       <ChildDevelopmentSelector
         childOptions={childOptions}

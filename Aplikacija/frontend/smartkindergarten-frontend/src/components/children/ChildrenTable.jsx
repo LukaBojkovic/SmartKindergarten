@@ -14,7 +14,7 @@ function ChildrenTable({
     return <div className="alert alert-info">Učitavanje dece...</div>;
 
   return (
-    <div className="table-responsive">
+    <div className="table-responsive actions-table-wrapper">
       <table className="table table-striped table-hover align-middle children-table app-table">
         <thead>
           <tr>

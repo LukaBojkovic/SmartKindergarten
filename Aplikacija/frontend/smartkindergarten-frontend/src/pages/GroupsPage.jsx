@@ -7,7 +7,9 @@ import GroupAssignments from "../components/groups/GroupAssignments";
 import GroupForm from "../components/groups/GroupForm";
 import GroupsTable from "../components/groups/GroupsTable";
 import { useAuth } from "../hooks/useAuth";
-import { FaSyncAlt } from "react-icons/fa";
+import { FaSearch, FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useConfirm } from "../hooks/useConfirm";
 
 const initialCreateForm = {
   name: "",
@@ -22,6 +24,7 @@ const initialEditForm = {
 function GroupsPage() 
 {
   const { user } = useAuth();
+  const confirm = useConfirm();
 
   const [groups, setGroups] = useState([]);
   const [childrenList, setChildrenList] = useState([]);
@@ -40,7 +43,6 @@ function GroupsPage()
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const canManage = user?.role === "Administrator";
 
@@ -161,20 +163,19 @@ function GroupsPage()
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       await groupsApi.create(createForm);
 
       setCreateForm(initialCreateForm);
-      setSuccessMessage("Grupa je uspešno kreirana.");
+      toast.success("Grupa je uspešno kreirana.");
 
       await loadGroups();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } 
     finally 
     {
@@ -190,7 +191,6 @@ function GroupsPage()
     });
 
     setError("");
-    setSuccessMessage("");
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -208,7 +208,6 @@ function GroupsPage()
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try 
     {
@@ -216,13 +215,13 @@ function GroupsPage()
 
       setEditingGroupId(null);
       setEditForm(initialEditForm);
-      setSuccessMessage("Grupa je uspešno ažurirana.");
+      toast.success("Grupa je uspešno ažurirana.");
 
       await loadGroups();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } 
     finally 
     {
@@ -231,15 +230,16 @@ function GroupsPage()
   };
 
   const handleDelete = async (group) => {
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da obrišeš grupu ${group.name}?`
-    );
+    const confirmed = await confirm({
+      title: "Brisanje grupe",
+      message: `Da li sigurno želiš da obrišeš grupu ${group.name}?`,
+      confirmText: "Obriši",
+    });
 
     if (!confirmed)
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try 
     {
@@ -248,12 +248,12 @@ function GroupsPage()
       if (selectedGroup?.id === group.id)
         setSelectedGroup(null);
 
-      setSuccessMessage("Grupa je uspešno obrisana.");
+      toast.success("Grupa je uspešno obrisana.");
       await loadGroups();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -263,7 +263,6 @@ function GroupsPage()
     setSelectedTeacherOption(null);
 
     setError("");
-    setSuccessMessage("");
 
   setTimeout(() => {
     window.scrollTo({
@@ -278,20 +277,19 @@ function GroupsPage()
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       await groupsApi.assignChild(selectedGroup.id, selectedChildOption.value);
 
       setSelectedChildOption(null);
-      setSuccessMessage("Dete je dodeljeno grupi.");
+      toast.success("Dete je dodeljeno grupi.");
 
       await loadGroups();
     }
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -300,20 +298,19 @@ function GroupsPage()
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       await groupsApi.assignTeacher(selectedGroup.id, selectedTeacherOption.value);
 
       setSelectedTeacherOption(null);
-      setSuccessMessage("Vaspitač je dodeljen grupi.");
+      toast.success("Vaspitač je dodeljen grupi.");
 
       await loadGroups();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -321,26 +318,60 @@ function GroupsPage()
     if (!selectedGroup)
       return;
 
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da ukloniš dete ${child.fullName} iz grupe?`
-    );
+    const confirmed = await confirm({
+      title: "Uklanjanje deteta",
+      message: `Da li sigurno želiš da ukloniš dete ${child.fullName} iz grupe?`,
+      confirmText: "Ukloni",
+    });
 
     if (!confirmed)
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       await groupsApi.removeChild(selectedGroup.id, child.id);
 
-      setSuccessMessage("Dete je uklonjeno iz grupe.");
+      toast.success("Dete je uklonjeno iz grupe.");
       await loadGroups();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
+    }
+  };
+
+  const handleRemoveAllChildren = async () => {
+    if (!selectedGroup || selectedGroup.children.length === 0)
+      return;
+
+    const confirmed = await confirm({
+      title: "Pražnjenje grupe",
+      message:
+        "Da li sigurno želiš da ukloniš svu decu iz trenutne grupe?",
+      confirmText: "Isprazni grupu",
+    });
+
+    if (!confirmed)
+      return;
+
+    setError("");
+
+    try 
+    {
+      await Promise.all(
+        selectedGroup.children.map((child) =>
+          groupsApi.removeChild(selectedGroup.id, child.id)
+        )
+      );
+
+      toast.success("Sva deca su uklonjena iz grupe.");
+      await loadGroups();
+    } 
+    catch (requestError) 
+    {
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -348,26 +379,27 @@ function GroupsPage()
     if (!selectedGroup)
       return;
 
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da ukloniš vaspitača ${teacher.fullName} iz grupe?`
-    );
+    const confirmed = await confirm({
+      title: "Uklanjanje vaspitača",
+      message: `Da li sigurno želiš da ukloniš vaspitača ${teacher.fullName} iz grupe?`,
+      confirmText: "Ukloni",
+    });
 
     if (!confirmed)
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try
     {
       await groupsApi.removeTeacher(selectedGroup.id, teacher.id);
 
-      setSuccessMessage("Vaspitač je uklonjen iz grupe.");
+      toast.success("Vaspitač je uklonjen iz grupe.");
       await loadGroups();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -401,10 +433,6 @@ function GroupsPage()
 
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
-
       <div className="row g-4">
         {canManage && (
           <div className="col-lg-4">
@@ -427,12 +455,17 @@ function GroupsPage()
             <div className="card-body">
               <div className="mb-3">
                 <label className="form-label">Pretraga grupa</label>
-                <input
-                  className="form-control"
-                  value={searchFilter}
-                  onChange={(event) => setSearchFilter(event.target.value)}
-                  placeholder="Naziv grupe"
-                />
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <FaSearch />
+                  </span>
+                  <input
+                    className="form-control"
+                    value={searchFilter}
+                    onChange={(event) => setSearchFilter(event.target.value)}
+                    placeholder="Naziv grupe"
+                  />
+                </div>
               </div>
 
               <GroupsTable
@@ -459,6 +492,7 @@ function GroupsPage()
             onAssignChild={handleAssignChild}
             onAssignTeacher={handleAssignTeacher}
             onRemoveChild={handleRemoveChild}
+            onRemoveAllChildren={handleRemoveAllChildren}
             onRemoveTeacher={handleRemoveTeacher}
           />
         </div>

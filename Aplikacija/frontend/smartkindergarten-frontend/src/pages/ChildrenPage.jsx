@@ -9,6 +9,8 @@ import { useAuth } from "../hooks/useAuth";
 import usersApi from "../api/usersApi";
 import ChildParentsManager from "../components/children/ChildParentsManager";
 import { FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useConfirm } from "../hooks/useConfirm";
 
 const initialCreateForm = {
   firstName: "",
@@ -29,6 +31,7 @@ const initialEditForm = {
 
 function ChildrenPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
 
   const [childrenList, setChildrenList] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -45,7 +48,6 @@ function ChildrenPage() {
   const [isGroupsLoading, setIsGroupsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const [parents, setParents] = useState([]);
   const [selectedChildForParents, setSelectedChildForParents] = useState(null);
@@ -206,7 +208,6 @@ function ChildrenPage() {
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try
      {
@@ -217,13 +218,13 @@ function ChildrenPage() {
       });
 
       setCreateForm(initialCreateForm);
-      setSuccessMessage("Dete je uspešno kreirano.");
+      toast.success("Dete je uspešno kreirano.");
 
       await loadChildren();
     }
      catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } 
     finally 
     {
@@ -243,7 +244,6 @@ function ChildrenPage() {
     });
 
     setError("");
-    setSuccessMessage("");
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -261,7 +261,6 @@ function ChildrenPage() {
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try 
     {
@@ -273,13 +272,13 @@ function ChildrenPage() {
 
       setEditingChildId(null);
       setEditForm(initialEditForm);
-      setSuccessMessage("Podaci o detetu su uspešno ažurirani.");
+      toast.success("Podaci o detetu su uspešno ažurirani.");
 
       await loadChildren();
     } 
     catch (requestError)
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     } 
     finally 
     {
@@ -288,26 +287,27 @@ function ChildrenPage() {
   };
 
   const handleDeactivate = async (child) => {
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da deaktiviraš dete ${child.firstName} ${child.lastName}?`
-    );
+    const confirmed = await confirm({
+      title: "Deaktivacija deteta",
+      message: `Da li sigurno želiš da deaktiviraš dete ${child.firstName} ${child.lastName}?`,
+      confirmText: "Deaktiviraj",
+    });
 
     if (!confirmed)
       return;
 
     setError("");
-    setSuccessMessage("");
 
     try 
     {
       await childrenApi.deactivate(child.id);
 
-      setSuccessMessage("Dete je deaktivirano.");
+      toast.success("Dete je deaktivirano.");
       await loadChildren();
     } 
     catch (requestError) 
     {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -315,7 +315,6 @@ function ChildrenPage() {
   setSelectedChildForParents(child);
   setSelectedParentOption(null);
   setError("");
-  setSuccessMessage("");
 
   setTimeout(() => {
     window.scrollTo({
@@ -331,7 +330,6 @@ const handleAssignParent = async () => {
 
   setIsParentSaving(true);
   setError("");
-  setSuccessMessage("");
 
   try 
   {
@@ -340,13 +338,13 @@ const handleAssignParent = async () => {
       selectedParentOption.value);
 
     setSelectedParentOption(null);
-    setSuccessMessage("Roditelj je uspešno povezan sa detetom.");
+    toast.success("Roditelj je uspešno povezan sa detetom.");
 
     await loadChildren();
   } 
   catch (requestError) 
   {
-    setError(getErrorMessage(requestError));
+    toast.error(getErrorMessage(requestError));
   } 
   finally 
   {
@@ -360,28 +358,29 @@ const handleRemoveParent = async (parent) => {
 
   const parentId = parent.id ?? parent.parentId;
 
-  const confirmed = window.confirm(
-    `Da li sigurno želiš da ukloniš roditelja ${parent.fullName} za ovo dete?`
-  );
+  const confirmed = await confirm({
+    title: "Uklanjanje roditelja",
+    message: `Da li sigurno želiš da ukloniš roditelja ${parent.fullName} za ovo dete?`,
+    confirmText: "Ukloni",
+  });
 
   if (!confirmed)
     return;
 
   setIsParentSaving(true);
   setError("");
-  setSuccessMessage("");
 
   try 
   {
     await childrenApi.removeParent(selectedChildForParents.id, parentId);
 
-    setSuccessMessage("Roditelj je uklonjen sa deteta.");
+    toast.success("Roditelj je uklonjen sa deteta.");
 
     await loadChildren();
   } 
   catch (requestError) 
   {
-    setError(getErrorMessage(requestError));
+    toast.error(getErrorMessage(requestError));
   } 
   finally 
   {
@@ -418,10 +417,6 @@ const parentOptions = parents
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
 
       {isGroupsLoading && (
         <div className="alert alert-info">Učitavanje grupa...</div>
