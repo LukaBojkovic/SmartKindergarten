@@ -92,16 +92,14 @@ function PaymentForm({
                   : "Evidentiraj uplatu"}
             </button>
 
-            {editingPaymentId && (
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={onCancelEdit}
-              >
-                <FaTimes className="me-2" />
-                Otkaži
-              </button>
-            )}
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={onCancelEdit}
+            >
+              <FaTimes className="me-2" />
+              Otkaži
+            </button>
           </div>
         </form>
       </div>

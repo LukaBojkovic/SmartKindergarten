@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { formatDate } from "../../utils/formatters";
 
 function DailyReportsList({
   reports,
@@ -149,14 +150,6 @@ function DailyReportsList({
       )}
     </>
   );
-}
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Date(value).toLocaleDateString("sr-RS");
 }
 
 export default DailyReportsList;

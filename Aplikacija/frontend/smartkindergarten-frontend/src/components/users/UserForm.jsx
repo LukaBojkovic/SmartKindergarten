@@ -1,7 +1,11 @@
 import { FaPlus, FaSave, FaUndo } from "react-icons/fa";
+import {
+  MANAGEABLE_USER_ROLE_OPTIONS,
+  USER_ROLE_LABELS,
+  USER_ROLES,
+} from "../../constants/userRoles";
 
 function UserForm({
-  userRoles,
   editingUserId,
   createForm,
   editForm,
@@ -12,6 +16,8 @@ function UserForm({
   onEditSubmit,
   onCancelEdit,
 }) {
+  const isEditingAdministrator = editForm.role === USER_ROLES.ADMINISTRATOR;
+
   if (!editingUserId) {
     return (
       <div className="card shadow-sm mb-4">
@@ -84,9 +90,9 @@ function UserForm({
                 value={createForm.role}
                 onChange={onCreateChange}
               >
-                {userRoles.map((role) => (
-                  <option value={role} key={role}>
-                    {role}
+                {MANAGEABLE_USER_ROLE_OPTIONS.map((roleOption) => (
+                  <option value={roleOption.value} key={roleOption.value}>
+                    {roleOption.label}
                   </option>
                 ))}
               </select>
@@ -153,13 +159,26 @@ function UserForm({
               className="form-select"
               value={editForm.role}
               onChange={onEditChange}
+              disabled={isEditingAdministrator}
             >
-              {userRoles.map((role) => (
-                <option value={role} key={role}>
-                  {role}
+              {isEditingAdministrator && (
+                <option value={USER_ROLES.ADMINISTRATOR}>
+                  {USER_ROLE_LABELS[USER_ROLES.ADMINISTRATOR]}
+                </option>
+              )}
+
+              {MANAGEABLE_USER_ROLE_OPTIONS.map((roleOption) => (
+                <option value={roleOption.value} key={roleOption.value}>
+                  {roleOption.label}
                 </option>
               ))}
             </select>
+
+            {isEditingAdministrator && (
+              <div className="form-text">
+                Promena administratorske uloge nije dozvoljena.
+              </div>
+            )}
           </div>
 
           <div className="form-check mb-3">

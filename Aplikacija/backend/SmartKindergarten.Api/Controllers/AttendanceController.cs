@@ -19,7 +19,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("group/{groupId}")]
-        [Authorize(Roles = "Administrator,Teacher,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator,Teacher")]
         public async Task<ActionResult<GroupAttendanceResponseDto>> GetByGroupAndDate(
             int groupId,
             [FromQuery] DateTime date)
@@ -36,7 +36,9 @@ namespace SmartKindergarten.Api.Controllers
             return Ok(result.Attendance);
         }
 
+
         [HttpGet("child/{childId}")]
+        [Authorize(Roles = "Administrator,Teacher")]
         public async Task<ActionResult<List<AttendanceResponseDto>>> GetByChild(
             int childId,
             [FromQuery] DateTime? fromDate,
@@ -56,7 +58,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrator,Teacher")]
+        [Authorize(Roles = "Teacher")]
         public async Task<ActionResult<AttendanceResponseDto>> Create(CreateAttendanceRequestDto request)
         {
             var result = await _attendanceService.CreateAsync(
@@ -71,7 +73,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrator,Teacher")]
+        [Authorize(Roles = "Teacher")]
         public async Task<ActionResult<AttendanceResponseDto>> Update(
             int id,
             UpdateAttendanceRequestDto request)
@@ -89,7 +91,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrator,Teacher")]
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _attendanceService.DeleteAsync(

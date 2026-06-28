@@ -8,13 +8,7 @@ import ResetPasswordForm from "../components/users/ResetPasswordForm";
 import { FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConfirm } from "../hooks/useConfirm";
-
-const USER_ROLES = [
-  "Administrator",
-  "Teacher",
-  "Parent",
-  "AdministrativeStaff",
-];
+import { USER_ROLE_OPTIONS, USER_ROLES } from "../constants/userRoles";
 
 const initialCreateForm = {
   username: "",
@@ -22,14 +16,14 @@ const initialCreateForm = {
   password: "",
   firstName: "",
   lastName: "",
-  role: "Parent",
+  role: USER_ROLES.PARENT,
 };
 
 const initialEditForm = {
   email: "",
   firstName: "",
   lastName: "",
-  role: "Parent",
+  role: USER_ROLES.PARENT,
   isActive: true,
 };
 
@@ -136,6 +130,12 @@ function UsersPage()
   const handleCreateSubmit = async (event) => {
     event.preventDefault();
 
+    if (createForm.role === USER_ROLES.ADMINISTRATOR) {
+      setError("");
+      toast.error("Nije dozvoljeno kreiranje novog administratora kroz aplikaciju.");
+      return;
+    }
+
     setIsSaving(true);
     setError("");
 
@@ -187,12 +187,28 @@ function UsersPage()
     if (!editingUserId)
       return;
 
+    if (editForm.role === USER_ROLES.ADMINISTRATOR) {
+      const originalUser = users.find((user) => user.id === editingUserId);
+
+      if (originalUser?.role !== USER_ROLES.ADMINISTRATOR) {
+        setError("");
+        toast.error("Nije dozvoljeno kreiranje novog administratora kroz aplikaciju.");
+        return;
+      }
+    }
+
     setIsSaving(true);
     setError("");
 
     try 
     {
-      await usersApi.update(editingUserId, editForm);
+      const originalUser = users.find((user) => user.id === editingUserId);
+      const userData =
+        originalUser?.role === USER_ROLES.ADMINISTRATOR
+          ? { ...editForm, role: USER_ROLES.ADMINISTRATOR }
+          : editForm;
+
+      await usersApi.update(editingUserId, userData);
 
       setEditingUserId(null);
       setEditForm(initialEditForm);
@@ -345,7 +361,7 @@ const handleResetPasswordChange = (event) => {
         <div>
           <h1>Korisnici</h1>
           <p className="text-muted mb-0">
-            Pregled i upravljanje korisničkim nalozima.
+            Nalozi zaposlenih i roditelja u aplikaciji.
           </p>
         </div>
 
@@ -370,7 +386,6 @@ const handleResetPasswordChange = (event) => {
           />
           ) : (
           <UserForm
-            userRoles={USER_ROLES}
             editingUserId={editingUserId}
             createForm={createForm}
             editForm={editForm}
@@ -386,7 +401,7 @@ const handleResetPasswordChange = (event) => {
 
         <div className="col-lg-8">
           <UsersFilters
-            userRoles={USER_ROLES}
+            userRoleOptions={USER_ROLE_OPTIONS}
             searchTerm={searchTerm}
             roleFilter={roleFilter}
             statusFilter={statusFilter}

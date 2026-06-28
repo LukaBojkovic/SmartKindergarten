@@ -1,4 +1,4 @@
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaEdit, FaInfoCircle, FaTrashAlt } from "react-icons/fa";
 
 function GroupsTable({
   groups,
@@ -61,6 +61,7 @@ function GroupsTable({
                         type="button"
                         onClick={() => onSelect(group)}
                       >
+                        <FaInfoCircle className="me-2" />
                         Detalji
                       </button>
                     </li>

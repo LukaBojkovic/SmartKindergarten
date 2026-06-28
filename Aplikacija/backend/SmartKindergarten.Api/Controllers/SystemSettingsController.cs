@@ -18,7 +18,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<List<SystemSettingResponseDto>>> GetAll()
         {
             var settings = await _systemSettingsService.GetAllAsync();
@@ -27,7 +27,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Administrator,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<SystemSettingResponseDto>> GetById(int id)
         {
             var setting = await _systemSettingsService.GetByIdAsync(id);
@@ -42,7 +42,7 @@ namespace SmartKindergarten.Api.Controllers
         [Authorize(Roles = "Administrator,AdministrativeStaff,Parent,Teacher")]
         public async Task<ActionResult<SystemSettingResponseDto>> GetByKey(string key)
         {
-            bool isLimitedUser = User.IsInRole("Parent") || User.IsInRole("Teacher");
+            bool isLimitedUser = User.IsInRole("Parent") || User.IsInRole("Teacher") || User.IsInRole("AdministrativeStaff");
 
             if (isLimitedUser && key != "MonthlyFee" && key != "KindergartenName")
                 return Forbid();

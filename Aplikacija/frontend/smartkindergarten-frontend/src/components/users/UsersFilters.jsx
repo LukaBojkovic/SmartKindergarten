@@ -1,7 +1,7 @@
 import { FaSearch, FaTimes } from "react-icons/fa";
 
 function UsersFilters({
-  userRoles,
+  userRoleOptions,
   searchTerm,
   roleFilter,
   statusFilter,
@@ -39,9 +39,9 @@ function UsersFilters({
               onChange={(event) => onRoleFilterChange(event.target.value)}
             >
               <option value="">Sve uloge</option>
-              {userRoles.map((role) => (
-                <option value={role} key={role}>
-                  {role}
+              {userRoleOptions.map((roleOption) => (
+                <option value={roleOption.value} key={roleOption.value}>
+                  {roleOption.label}
                 </option>
               ))}
             </select>

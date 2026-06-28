@@ -19,7 +19,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Teacher,Parent,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator,Teacher,Parent")]
         public async Task<ActionResult<List<DailyReportResponseDto>>> GetAll()
         {
             var result = await _dailyReportService.GetAllAsync(
@@ -33,7 +33,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Administrator,Teacher,Parent,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator,Teacher,Parent")]
         public async Task<ActionResult<DailyReportResponseDto>> GetById(int id)
         {
             var result = await _dailyReportService.GetByIdAsync(
@@ -48,7 +48,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("group/{groupId}")]
-        [Authorize(Roles = "Administrator,Teacher,Parent,AdministrativeStaff")]
+        [Authorize(Roles = "Administrator,Teacher,Parent")]
         public async Task<ActionResult<List<DailyReportResponseDto>>> GetByGroup(int groupId)
         {
             var result = await _dailyReportService.GetByGroupAsync(
@@ -78,7 +78,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrator,Teacher")]
+        [Authorize(Roles = "Teacher")]
         public async Task<ActionResult<DailyReportResponseDto>> Update(
             int id,
             UpdateDailyReportRequestDto request)
@@ -96,7 +96,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrator,Teacher")]
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _dailyReportService.DeleteAsync(

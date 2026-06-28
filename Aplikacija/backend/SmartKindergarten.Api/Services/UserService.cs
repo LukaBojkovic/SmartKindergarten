@@ -71,6 +71,9 @@ namespace SmartKindergarten.Api.Services
                 return (false, "Neispravna korisnička uloga.", null);
             }
 
+            if (role == UserRole.Administrator)
+                return (false, "Nije dozvoljeno kreiranje novog administratora kroz aplikaciju.", null);
+
             User user = new User
             {
                 Username = request.Username.Trim(),
@@ -121,11 +124,30 @@ namespace SmartKindergarten.Api.Services
                     return (false, "Neispravna korisnička uloga.", null);
                 }
 
+                if (role == UserRole.Administrator && user.Role != UserRole.Administrator)
+                    return (false, "Nije dozvoljeno dodeljivanje administratorske uloge kroz aplikaciju.", null);
+
+                if (user.Role == UserRole.Administrator && role != UserRole.Administrator)
+                    return (false, "Nije dozvoljeno menjanje uloge postojećeg administratora kroz aplikaciju.", null);
+
+
                 user.Role = role;
             }
 
+
             if (request.IsActive.HasValue)
+            {
+                if (user.Role == UserRole.Administrator && user.IsActive && request.IsActive.Value == false)
+                {
+                    int activeAdministratorCount = await _context.Users
+                        .CountAsync(u => u.Role == UserRole.Administrator && u.IsActive);
+
+                    if (activeAdministratorCount <= 1)
+                        return (false, "Nije dozvoljeno deaktivirati jedinog aktivnog administratora.", null);
+                }
+
                 user.IsActive = request.IsActive.Value;
+            }
 
             await _context.SaveChangesAsync();
 
@@ -151,17 +173,27 @@ namespace SmartKindergarten.Api.Services
 
             return (true, null);
         }
-        public async Task<bool> DeactivateAsync(int id)
+        public async Task<(bool Success, string? Error)> DeactivateAsync(int id)
         {
             User? user = await _context.Users.FindAsync(id);
 
             if (user == null)
-                return false;
+                return (false, "Korisnik nije pronađen.");
+
+            if (user.Role == UserRole.Administrator && user.IsActive)
+            {
+                int activeAdministratorCount = await _context.Users
+                    .CountAsync(u => u.Role == UserRole.Administrator && u.IsActive);
+
+                if (activeAdministratorCount <= 1)
+                    return (false, "Nije dozvoljeno deaktivirati jedinog aktivnog administratora.");
+            }
 
             user.IsActive = false;
+
             await _context.SaveChangesAsync();
 
-            return true;
+            return (true,null);
         }
 
         private static UserResponseDto ToDto(User user)

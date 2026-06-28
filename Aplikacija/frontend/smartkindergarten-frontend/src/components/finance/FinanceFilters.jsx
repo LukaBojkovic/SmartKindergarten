@@ -1,4 +1,5 @@
 import Select from "react-select";
+import { formatCurrency } from "../../utils/formatters";
 
 function FinanceFilters({
   childOptions,
@@ -50,7 +51,7 @@ function FinanceFilters({
           </div>
 
           <div className="col-lg-2">
-            <label className="form-label">Broj meseci</label>
+            <label className="form-label">Broj meseci za obračun</label>
             <input
               type="number"
               min="1"
@@ -82,7 +83,7 @@ function FinanceFilters({
         </div>
 
         <div className="form-text mt-2">
-          Očekivana obaveza se računa kao: mesečna članarina × broj meseci.
+          Poređenje ukupno očekivane članarine i evidentiranih uplata za izabrano dete.
         </div>
 
         <button
@@ -95,13 +96,6 @@ function FinanceFilters({
       </div>
     </div>
   );
-}
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("sr-RS", {
-    style: "currency",
-    currency: "RSD",
-  }).format(value);
 }
 
 export default FinanceFilters;

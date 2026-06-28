@@ -1,3 +1,5 @@
+import { formatCurrency, formatDate } from "../../utils/formatters";
+
 function FinanceStatusCard({ status, isLoading, monthlyFee, numberOfMonths }) {
   if (isLoading) {
     return (
@@ -130,17 +132,6 @@ function formatBalance(balance) {
   }
 
   return "Izmireno";
-}
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("sr-RS", {
-    style: "currency",
-    currency: "RSD",
-  }).format(value);
-}
-
-function formatDate(value) {
-  return new Date(value).toLocaleDateString("sr-RS");
 }
 
 export default FinanceStatusCard;

@@ -11,6 +11,8 @@ import ChildParentsManager from "../components/children/ChildParentsManager";
 import { FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConfirm } from "../hooks/useConfirm";
+import { USER_ROLES } from "../constants/userRoles";
+import { toDateInputValue, toUtcIsoDate } from "../utils/dateUtils";
 
 const initialCreateForm = {
   firstName: "",
@@ -54,7 +56,8 @@ function ChildrenPage() {
   const [selectedParentOption, setSelectedParentOption] = useState(null);
   const [isParentSaving, setIsParentSaving] = useState(false);
 
-  const canManage = user?.role === "Administrator";
+  const canManage = user?.role === USER_ROLES.ADMINISTRATOR;
+  const pageDescription = getPageDescription(user?.role);
 
   useEffect(() => {
     let isCancelled = false;
@@ -92,7 +95,7 @@ function ChildrenPage() {
   let isCancelled = false;
 
   usersApi
-    .getAll({ role: "Parent", isActive: "true" })
+    .getAll({ role: USER_ROLES.PARENT, isActive: "true" })
     .then((data) => {
       if (!isCancelled) {
         setParents(data);
@@ -405,9 +408,7 @@ const parentOptions = parents
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
           <h1>Deca</h1>
-          <p className="text-muted mb-0">
-            Pregled i upravljanje podacima o deci.
-          </p>
+          <p className="text-muted mb-0">{pageDescription}</p>
         </div>
 
         <button className="btn btn-outline-primary" onClick={loadChildren}>
@@ -482,19 +483,6 @@ const parentOptions = parents
   );
 }
 
-function toUtcIsoDate(dateInputValue)
-{
-  return `${dateInputValue}T00:00:00Z`;
-}
-
-function toDateInputValue(dateValue) 
-{
-  if (!dateValue)
-    return "";
-
-  return dateValue.substring(0, 10);
-}
-
 function getErrorMessage(error) 
 {
   if (typeof error.response?.data === "string")
@@ -505,6 +493,18 @@ function getErrorMessage(error)
     return error.response.data.message;
 
   return "Došlo je do greške. Proveri da li backend radi i da li imaš dozvolu.";
+}
+
+function getPageDescription(role) {
+  if (role === USER_ROLES.TEACHER) {
+    return "Deca iz vaših grupa, osnovni podaci i roditelji za komunikaciju.";
+  }
+
+  if (role === USER_ROLES.ADMINISTRATIVE_STAFF) {
+    return "Podaci o deci, grupama i roditeljima za komunikaciju i finansije.";
+  }
+
+  return "Podaci o deci, grupama i roditeljima na jednom mestu.";
 }
 
 export default ChildrenPage;

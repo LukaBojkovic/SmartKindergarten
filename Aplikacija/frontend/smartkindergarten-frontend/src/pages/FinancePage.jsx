@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useMemo, useState } from "react";
-import { FaPlus, FaSyncAlt } from "react-icons/fa";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FaChartBar, FaPlus, FaSyncAlt, FaTimes } from "react-icons/fa";
 import childrenApi from "../api/childrenApi";
 import paymentsApi from "../api/paymentsApi";
 import systemSettingsApi from "../api/systemSettingsApi";
@@ -10,6 +10,15 @@ import MonthlyFinanceReport from "../components/finance/MonthlyFinanceReport";
 import PaymentForm from "../components/finance/PaymentForm";
 import PaymentsTable from "../components/finance/PaymentsTable";
 import { useAuth } from "../hooks/useAuth";
+import { useConfirm } from "../hooks/useConfirm";
+import { toast } from "react-toastify";
+import { SYSTEM_SETTING_KEYS } from "../constants/systemSettingKeys";
+import { USER_ROLES } from "../constants/userRoles";
+import {
+  getTodayDateInputValue,
+  toDateInputValue,
+  toUtcIsoDate,
+} from "../utils/dateUtils";
 
 const initialForm = {
   amount: "",
@@ -17,10 +26,10 @@ const initialForm = {
   description: "",
 };
 
-const MONTHLY_FEE_KEY = "MonthlyFee";
-
 function FinancePage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
+  const monthlyReportRef = useRef(null);
 
   const today = new Date();
 
@@ -44,6 +53,7 @@ function FinancePage() {
   const [form, setForm] = useState(initialForm);
   const [editingPaymentId, setEditingPaymentId] = useState(null);
   const [isPaymentFormVisible, setIsPaymentFormVisible] = useState(false);
+  const [isMonthlyReportVisible, setIsMonthlyReportVisible] = useState(false);
 
   const [isLoadingChildren, setIsLoadingChildren] = useState(true);
   const [isLoadingMonthlyFee, setIsLoadingMonthlyFee] = useState(true);
@@ -52,12 +62,11 @@ function FinancePage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-
   const canViewMonthlyReport =
-    user?.role === "Administrator" || user?.role === "AdministrativeStaff";
+    user?.role === USER_ROLES.ADMINISTRATOR ||
+    user?.role === USER_ROLES.ADMINISTRATIVE_STAFF;
 
-  const canManagePayments = user?.role === "AdministrativeStaff";
+  const canManagePayments = user?.role === USER_ROLES.ADMINISTRATIVE_STAFF;
 
   const selectedChildId = selectedChildOption?.value;
 
@@ -83,7 +92,7 @@ function FinancePage() {
     setIsLoadingMonthlyFee(true);
 
     systemSettingsApi
-      .getByKey(MONTHLY_FEE_KEY)
+      .getByKey(SYSTEM_SETTING_KEYS.MONTHLY_FEE)
       .then((setting) => {
         if (isCancelled) {
           return;
@@ -301,6 +310,17 @@ function FinancePage() {
     setMonthlyReportRefreshKey((previousValue) => previousValue + 1);
   };
 
+  const openMonthlyReport = () => {
+    setIsMonthlyReportVisible(true);
+
+    setTimeout(() => {
+      monthlyReportRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
+  };
+
   const openCreatePaymentForm = () => {
     setEditingPaymentId(null);
 
@@ -311,7 +331,6 @@ function FinancePage() {
 
     setIsPaymentFormVisible(true);
     setError("");
-    setSuccessMessage("");
 
     setTimeout(() => {
       document
@@ -344,20 +363,19 @@ function FinancePage() {
 
     setIsSaving(true);
     setError("");
-    setSuccessMessage("");
 
     try {
       if (editingPaymentId) {
         await paymentsApi.update(editingPaymentId, paymentData);
 
-        setSuccessMessage("Uplata je uspešno ažurirana.");
+        toast.success("Uplata je uspešno ažurirana.");
       } else {
         await paymentsApi.create({
           ...paymentData,
           childId: selectedChildId,
         });
 
-        setSuccessMessage("Uplata je uspešno evidentirana.");
+        toast.success("Uplata je uspešno evidentirana.");
       }
 
       resetForm();
@@ -386,7 +404,6 @@ function FinancePage() {
 
     setIsPaymentFormVisible(true);
     setError("");
-    setSuccessMessage("");
 
     setTimeout(() => {
       document
@@ -405,25 +422,26 @@ function FinancePage() {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Da li sigurno želiš da obrišeš uplatu za ${payment.childFullName}?`
-    );
+    const confirmed = await confirm({
+      title: "Brisanje uplate",
+      message: `Da li sigurno želiš da obrišeš uplatu za ${payment.childFullName}?`,
+      confirmText: "Obriši",
+    });
 
     if (!confirmed) {
       return;
     }
 
     setError("");
-    setSuccessMessage("");
 
     try {
       await paymentsApi.delete(payment.id);
 
-      setSuccessMessage("Uplata je obrisana.");
+      toast.success("Uplata je obrisana.");
       await loadFinance();
       refreshMonthlyReport();
     } catch (requestError) {
-      setError(getErrorMessage(requestError));
+      toast.error(getErrorMessage(requestError));
     }
   };
 
@@ -462,6 +480,16 @@ function FinancePage() {
             </button>
           )}
 
+          {canViewMonthlyReport && (
+            <button
+              className="btn btn-primary"
+              onClick={openMonthlyReport}
+            >
+              <FaChartBar className="me-2" />
+              Mesečni finansijski izveštaj
+            </button>
+          )}
+
           <button
             className="btn btn-outline-primary"
             onClick={loadFinance}
@@ -474,24 +502,6 @@ function FinancePage() {
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {successMessage && (
-        <div className="alert alert-success">{successMessage}</div>
-      )}
-
-      {canViewMonthlyReport && (
-        <MonthlyFinanceReport
-          childrenList={childrenList}
-          payments={allPayments}
-          monthlyFee={monthlyFee}
-          reportMonth={reportMonth}
-          reportYear={reportYear}
-          isLoading={isLoadingMonthlyReport || isLoadingChildren}
-          onMonthChange={setReportMonth}
-          onYearChange={setReportYear}
-          onRefresh={refreshMonthlyReport}
-        />
-      )}
 
       <FinanceFilters
         childOptions={childOptions}
@@ -543,6 +553,33 @@ function FinancePage() {
         onStartEdit={startEdit}
         onDelete={deletePayment}
       />
+
+      {canViewMonthlyReport && isMonthlyReportVisible && (
+        <div className="mt-4" ref={monthlyReportRef}>
+          <div className="d-flex justify-content-end mb-2">
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={() => setIsMonthlyReportVisible(false)}
+            >
+              <FaTimes className="me-2" />
+              Sakrij izveštaj
+            </button>
+          </div>
+
+          <MonthlyFinanceReport
+            childrenList={childrenList}
+            payments={allPayments}
+            monthlyFee={monthlyFee}
+            reportMonth={reportMonth}
+            reportYear={reportYear}
+            isLoading={isLoadingMonthlyReport || isLoadingChildren}
+            onMonthChange={setReportMonth}
+            onYearChange={setReportYear}
+            onRefresh={refreshMonthlyReport}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -553,32 +590,12 @@ function getChildLabel(child) {
   return `${child.firstName} ${child.lastName}${groupPart}`;
 }
 
-function getTodayDateInputValue() {
-  return new Date().toISOString().substring(0, 10);
-}
-
-function toDateInputValue(value) {
-  if (!value) {
-    return "";
-  }
-
-  return value.substring(0, 10);
-}
-
-function toUtcIsoDate(value) {
-  if (!value) {
-    return null;
-  }
-
-  return `${value}T00:00:00Z`;
-}
-
 function getPageDescription(role) {
-  if (role === "Administrator") {
+  if (role === USER_ROLES.ADMINISTRATOR) {
     return "Pregled finansijskog statusa dece i mesečnih finansijskih izveštaja.";
   }
 
-  if (role === "AdministrativeStaff") {
+  if (role === USER_ROLES.ADMINISTRATIVE_STAFF) {
     return "Pregled finansija, mesečni izveštaji i evidentiranje uplata.";
   }
 

@@ -221,8 +221,7 @@ namespace SmartKindergarten.Api.Services
 
         private async Task<bool> CanViewGroupAttendanceAsync(int groupId, int currentUserId, string currentUserRole)
         {
-            if (currentUserRole == UserRole.Administrator.ToString() ||
-                currentUserRole == UserRole.AdministrativeStaff.ToString())
+            if (currentUserRole == UserRole.Administrator.ToString())
             {
                 return await _context.KindergartenGroups.AnyAsync(g => g.Id == groupId);
             }
@@ -238,34 +237,6 @@ namespace SmartKindergarten.Api.Services
         }
 
         private async Task<bool> CanViewChildAttendanceAsync(int childId, int currentUserId, string currentUserRole)
-        {
-            if (currentUserRole == UserRole.Administrator.ToString() ||
-                currentUserRole == UserRole.AdministrativeStaff.ToString())
-            {
-                return await _context.Children.AnyAsync(c => c.Id == childId);
-            }
-
-            if (currentUserRole == UserRole.Teacher.ToString())
-            {
-                return await _context.Children.AnyAsync(c =>
-                    c.Id == childId &&
-                    c.GroupId.HasValue &&
-                    _context.TeacherGroups.Any(tg =>
-                        tg.TeacherId == currentUserId &&
-                        tg.GroupId == c.GroupId.Value));
-            }
-
-            if (currentUserRole == UserRole.Parent.ToString())
-            {
-                return await _context.ParentChildren.AnyAsync(pc =>
-                    pc.ChildId == childId &&
-                    pc.ParentId == currentUserId);
-            }
-
-            return false;
-        }
-
-        private async Task<bool> CanManageChildAttendanceAsync(int childId, int currentUserId, string currentUserRole)
         {
             if (currentUserRole == UserRole.Administrator.ToString())
             {
@@ -283,6 +254,21 @@ namespace SmartKindergarten.Api.Services
             }
 
             return false;
+        }
+
+        private async Task<bool> CanManageChildAttendanceAsync(int childId, int currentUserId, string currentUserRole)
+        {
+            if (currentUserRole != UserRole.Teacher.ToString())
+            {
+                return false;
+            }
+
+                return await _context.Children.AnyAsync(c =>
+                    c.Id == childId &&
+                    c.GroupId.HasValue &&
+                    _context.TeacherGroups.Any(tg =>
+                        tg.TeacherId == currentUserId &&
+                        tg.GroupId == c.GroupId.Value));
         }
 
         private async Task<bool> AttendanceExistsForDateAsync(int childId, DateTime date, int? excludedAttendanceId)

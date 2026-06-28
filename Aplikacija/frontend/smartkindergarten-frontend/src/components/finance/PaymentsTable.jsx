@@ -1,4 +1,5 @@
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { formatCurrency, formatDate } from "../../utils/formatters";
 
 function PaymentsTable({
   payments,
@@ -16,7 +17,7 @@ function PaymentsTable({
       <div className="card-body">
         <h5 className="card-title">Uplate</h5>
 
-        <div className="table-responsive">
+        <div className="payments-table-wrapper">
           <table className="table table-striped table-hover align-middle app-table payments-table">
             <thead>
               <tr>
@@ -98,21 +99,6 @@ function PaymentsTable({
       </div>
     </div>
   );
-}
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("sr-RS", {
-    style: "currency",
-    currency: "RSD",
-  }).format(value);
-}
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Date(value).toLocaleDateString("sr-RS");
 }
 
 export default PaymentsTable;

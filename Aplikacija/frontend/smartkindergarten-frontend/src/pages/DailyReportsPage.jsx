@@ -1,14 +1,23 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from "react";
+import childrenApi from "../api/childrenApi";
 import dailyReportsApi from "../api/dailyReportsApi";
 import groupsApi from "../api/groupsApi";
 import DailyReportForm from "../components/dailyReports/DailyReportForm";
 import DailyReportsFilters from "../components/dailyReports/DailyReportsFilters";
 import DailyReportsList from "../components/dailyReports/DailyReportsList";
+import PaginationControls from "../components/common/PaginationControls";
 import { useAuth } from "../hooks/useAuth";
-import { FaSyncAlt } from "react-icons/fa";
+import { FaPlus, FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConfirm } from "../hooks/useConfirm";
+import { USER_ROLES } from "../constants/userRoles";
+import {
+  getTodayDateInputValue,
+  toDateInputValue,
+  toUtcIsoDate,
+} from "../utils/dateUtils";
+import { getTotalPages, paginateItems } from "../utils/paginationUtils";
 
 const initialForm = {
   groupId: "",
@@ -19,6 +28,7 @@ const initialForm = {
 };
 
 const MAX_IMAGE_SIZE_BYTES = 500 * 1024;
+const PAGE_SIZE = 10;
 
 const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
@@ -32,30 +42,34 @@ function DailyReportsPage() {
 
   const [reports, setReports] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [childrenList, setChildrenList] = useState([]);
 
   const [groupFilter, setGroupFilter] = useState("");
+  const [childFilter, setChildFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [searchFilter, setSearchFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [form, setForm] = useState(initialForm);
   const [editingReportId, setEditingReportId] = useState(null);
+  const [isReportFormVisible, setIsReportFormVisible] = useState(false);
 
   const [isLoadingReports, setIsLoadingReports] = useState(true);
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+  const [isLoadingChildren, setIsLoadingChildren] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [error, setError] = useState("");
 
-  const canCreate = user?.role === "Teacher";
-  const currentUserId = user?.id ?? user?.userId;
+  const canCreate = user?.role === USER_ROLES.TEACHER;
+  const isParent = user?.role === USER_ROLES.PARENT;
+  const selectedChild = childrenList.find(
+    (child) => String(child.id) === String(childFilter)
+  );
+  const selectedChildGroupId = selectedChild?.groupId;
+  const selectedChildHasNoGroup = isParent && selectedChild && !selectedChildGroupId;
 
-  const canEditReport = (report) => {
-    if (user?.role === "Administrator") {
-      return true;
-    }
-
-    return user?.role === "Teacher" && Number(report.teacherId) === Number(currentUserId);
-  };
+  const canEditReport = () => user?.role === USER_ROLES.TEACHER;
 
   const canDeleteReport = canEditReport;
 
@@ -71,7 +85,7 @@ function DailyReportsPage() {
           setGroups(data);
           setError("");
 
-          if (data.length > 0 && user?.role === "Teacher") {
+          if (data.length > 0 && user?.role === USER_ROLES.TEACHER) {
             setForm((previousForm) => {
               if (previousForm.groupId) {
                 return previousForm;
@@ -102,13 +116,67 @@ function DailyReportsPage() {
   }, [user?.role]);
 
   useEffect(() => {
+    if (!isParent) {
+      setChildrenList([]);
+      setChildFilter("");
+      setIsLoadingChildren(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    setIsLoadingChildren(true);
+
+    childrenApi
+      .getAll({
+        search: "",
+        groupId: "",
+        isActive: "true",
+      })
+      .then((data) => {
+        if (!isCancelled) {
+          setChildrenList(data);
+          setError("");
+
+          setChildFilter((previousChildId) => {
+            if (
+              previousChildId &&
+              data.some((child) => String(child.id) === String(previousChildId))
+            ) {
+              return previousChildId;
+            }
+
+            return data.length === 1 ? String(data[0].id) : "";
+          });
+        }
+      })
+      .catch((requestError) => {
+        if (!isCancelled) {
+          setError(getErrorMessage(requestError));
+        }
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsLoadingChildren(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isParent]);
+
+  useEffect(() => {
     let isCancelled = false;
 
     setIsLoadingReports(true);
 
-    const request = groupFilter
-      ? dailyReportsApi.getByGroup(groupFilter)
-      : dailyReportsApi.getAll();
+    const request = getReportsRequest({
+      isParent,
+      selectedChildGroupId,
+      selectedChildHasNoGroup,
+      groupFilter,
+    });
 
     request
       .then((data) => {
@@ -131,7 +199,7 @@ function DailyReportsPage() {
     return () => {
       isCancelled = true;
     };
-  }, [groupFilter]);
+  }, [groupFilter, isParent, selectedChildGroupId, selectedChildHasNoGroup]);
 
   const filteredReports = useMemo(() => {
     return reports.filter((report) => {
@@ -149,14 +217,34 @@ function DailyReportsPage() {
     });
   }, [reports, dateFilter, searchFilter]);
 
+  const totalPages = getTotalPages(filteredReports.length, PAGE_SIZE);
+  const paginatedReports = paginateItems(
+    filteredReports,
+    currentPage,
+    PAGE_SIZE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [groupFilter, childFilter, dateFilter, searchFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
   const loadReports = async () => {
     setIsLoadingReports(true);
     setError("");
 
     try {
-      const data = groupFilter
-        ? await dailyReportsApi.getByGroup(groupFilter)
-        : await dailyReportsApi.getAll();
+      const data = await getReportsRequest({
+        isParent,
+        selectedChildGroupId,
+        selectedChildHasNoGroup,
+        groupFilter,
+      });
 
       setReports(data);
     } catch (requestError) {
@@ -164,6 +252,25 @@ function DailyReportsPage() {
     } finally {
       setIsLoadingReports(false);
     }
+  };
+
+  const openCreateReportForm = () => {
+    setEditingReportId(null);
+
+    setForm({
+      ...initialForm,
+      groupId: groups.length > 0 && user?.role === USER_ROLES.TEACHER ? String(groups[0].id) : "",
+      reportDate: getTodayDateInputValue(),
+    });
+
+    setIsReportFormVisible(true);
+    setError("");
+
+    setTimeout(() => {
+      document
+        .getElementById("daily-report-form-section")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   const handleFormChange = (event) => {
@@ -252,6 +359,7 @@ const handleClearImage = () => {
       }
 
       resetForm();
+      setIsReportFormVisible(false);
       await loadReports();
     } catch (requestError) {
       toast.error(getErrorMessage(requestError));
@@ -271,6 +379,7 @@ const handleClearImage = () => {
       reportDate: toDateInputValue(report.reportDate),
     });
 
+    setIsReportFormVisible(true);
     setError("");
 
      setTimeout(() => {
@@ -282,6 +391,7 @@ const handleClearImage = () => {
 
   const cancelEdit = () => {
     resetForm();
+    setIsReportFormVisible(false);
   };
 
   const deleteReport = async (report) => {
@@ -312,13 +422,14 @@ const handleClearImage = () => {
 
     setForm({
       ...initialForm,
-      groupId: groups.length > 0 && user?.role === "Teacher" ? String(groups[0].id) : "",
+      groupId: groups.length > 0 && user?.role === USER_ROLES.TEACHER ? String(groups[0].id) : "",
       reportDate: getTodayDateInputValue(),
     });
   };
 
   const clearFilters = () => {
     setGroupFilter("");
+    setChildFilter(childrenList.length === 1 ? String(childrenList[0].id) : "");
     setDateFilter("");
     setSearchFilter("");
   };
@@ -330,8 +441,8 @@ const handleClearImage = () => {
   };
 
   const pageDescription =
-    user?.role === "Teacher"
-      ? "Kreiranje i pregled dnevnih izveštaja za grupe kojima ste dodeljeni."
+    user?.role === USER_ROLES.TEACHER
+      ? "Dnevni izveštaji i aktivnosti za vaše grupe."
       : "Pregled dnevnih izveštaja i aktivnosti dece.";
 
   return (
@@ -342,6 +453,18 @@ const handleClearImage = () => {
           <p className="text-muted mb-0">{pageDescription}</p>
         </div>
 
+        <div className="d-flex gap-2">
+          {canCreate && (
+            <button
+              className="btn btn-primary"
+              onClick={openCreateReportForm}
+              disabled={isLoadingGroups || groups.length === 0}
+            >
+              <FaPlus className="me-2" />
+              Dodaj izveštaj
+            </button>
+          )}
+
         <button
           className="btn btn-outline-primary"
           onClick={loadReports}
@@ -350,22 +473,27 @@ const handleClearImage = () => {
           <FaSyncAlt className="me-2" />
           Osveži
         </button>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {isLoadingGroups && (
+      {isLoadingGroups && !isParent && (
         <div className="alert alert-info">Učitavanje grupa...</div>
       )}
 
-      {editingReportId && (
+      {isLoadingChildren && (
+        <div className="alert alert-info">Učitavanje dece...</div>
+      )}
+
+      {editingReportId && isReportFormVisible && (
         <div className="alert alert-info">
           U toku je izmena dnevnog izveštaja. Lista izveštaja je privremeno sakrivena
           dok ne sačuvaš ili otkažeš izmenu.
         </div>
       )}
 
-      {(canCreate || editingReportId) && (
+      {isReportFormVisible && (canCreate || editingReportId) && (
         <div id="daily-report-form-section">
           <DailyReportForm
             groups={groups}
@@ -383,27 +511,43 @@ const handleClearImage = () => {
         </div>
       )}
       
-      {!editingReportId && (
+      {!isReportFormVisible && (
         <>
         <DailyReportsFilters
           groups={groups}
+          childrenList={childrenList}
+          isParent={isParent}
           groupFilter={groupFilter}
+          childFilter={childFilter}
           dateFilter={dateFilter}
           searchFilter={searchFilter}
           onGroupFilterChange={setGroupFilter}
+          onChildFilterChange={setChildFilter}
           onDateFilterChange={setDateFilter}
           onSearchFilterChange={setSearchFilter}
           onClearFilters={clearFilters}
         />
 
+        {selectedChildHasNoGroup && (
+          <div className="alert alert-info">
+            Za izabrano dete nema dostupnih dnevnih izveštaja jer nije dodeljeno grupi.
+          </div>
+        )}
+
         <DailyReportsList
-          reports={filteredReports}
+          reports={paginatedReports}
           isLoading={isLoadingReports}
           getGroupName={getGroupName}
           canEditReport={canEditReport}
           canDeleteReport={canDeleteReport}
           onStartEdit={startEdit}
           onDelete={deleteReport}
+        />
+
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
         />
       </>
     )}
@@ -428,24 +572,23 @@ function convertFileToBase64(file) {
   });
 }
 
-function getTodayDateInputValue() {
-  return new Date().toISOString().substring(0, 10);
-}
+function getReportsRequest({
+  isParent,
+  selectedChildGroupId,
+  selectedChildHasNoGroup,
+  groupFilter,
+}) {
+  if (isParent) {
+    if (!selectedChildGroupId || selectedChildHasNoGroup) {
+      return Promise.resolve([]);
+    }
 
-function toDateInputValue(value) {
-  if (!value) {
-    return "";
+    return dailyReportsApi.getByGroup(selectedChildGroupId);
   }
 
-  return value.substring(0, 10);
-}
-
-function toUtcIsoDate(value) {
-  if (!value) {
-    return null;
-  }
-
-  return `${value}T00:00:00Z`;
+  return groupFilter
+    ? dailyReportsApi.getByGroup(groupFilter)
+    : dailyReportsApi.getAll();
 }
 
 function getErrorMessage(error) {

@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { getDevelopmentAreaLabel } from "../../constants/developmentAreas";
+import { formatDate } from "../../utils/formatters";
 
 ChartJS.register(
   CategoryScale,
@@ -23,10 +24,9 @@ ChartJS.register(
 
 const AREA_COLORS = {
   SocialSkills: "#4f8f70",
-  CognitiveSkills: "#4f7cac",
+  CognitiveDevelopment: "#4f7cac",
   MotorSkills: "#f4b860",
-  Communication: "#9b6bcc",
-  EmotionalDevelopment: "#d96c75",
+  SpeechLanguageDevelopment: "#9b6bcc",
 };
 
 function DevelopmentProgressChart({ progressPoints, selectedArea }) {
@@ -123,10 +123,6 @@ function DevelopmentProgressChart({ progressPoints, selectedArea }) {
       </div>
     </div>
   );
-}
-
-function formatDate(value) {
-  return new Date(value).toLocaleDateString("sr-RS");
 }
 
 export default DevelopmentProgressChart;

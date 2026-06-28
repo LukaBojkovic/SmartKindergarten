@@ -2,10 +2,14 @@ import DatePickerInput from "../common/DatePickerInput";
 
 function DailyReportsFilters({
   groups,
+  childrenList,
+  isParent,
   groupFilter,
+  childFilter,
   dateFilter,
   searchFilter,
   onGroupFilterChange,
+  onChildFilterChange,
   onDateFilterChange,
   onSearchFilterChange,
   onClearFilters,
@@ -16,22 +20,42 @@ function DailyReportsFilters({
         <h5 className="card-title">Filteri</h5>
 
         <div className="row g-3">
-          <div className="col-md-4">
-            <label className="form-label">Grupa</label>
-            <select
-              className="form-select"
-              value={groupFilter}
-              onChange={(event) => onGroupFilterChange(event.target.value)}
-            >
-              <option value="">Sve grupe</option>
+          {isParent ? (
+            <div className="col-md-4">
+              <label className="form-label">Dete</label>
+              <select
+                className="form-select"
+                value={childFilter}
+                onChange={(event) => onChildFilterChange(event.target.value)}
+              >
+                <option value="">Izaberi dete</option>
 
-              {groups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-          </div>
+                {childrenList.map((child) => (
+                  <option key={child.id} value={child.id}>
+                    {child.firstName} {child.lastName}
+                    {child.groupName ? ` - ${child.groupName}` : " - bez grupe"}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="col-md-4">
+              <label className="form-label">Grupa</label>
+              <select
+                className="form-select"
+                value={groupFilter}
+                onChange={(event) => onGroupFilterChange(event.target.value)}
+              >
+                <option value="">Sve grupe</option>
+
+                {groups.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="col-md-4">
             <label className="form-label">Datum</label>

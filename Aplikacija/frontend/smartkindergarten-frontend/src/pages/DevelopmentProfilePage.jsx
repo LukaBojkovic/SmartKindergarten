@@ -11,6 +11,12 @@ import { useAuth } from "../hooks/useAuth";
 import { FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConfirm } from "../hooks/useConfirm";
+import { USER_ROLES } from "../constants/userRoles";
+import {
+  getTodayDateInputValue,
+  toDateInputValue,
+  toUtcIsoDate,
+} from "../utils/dateUtils";
 
 const initialNoteForm = {
   content: "",
@@ -49,7 +55,7 @@ function DevelopmentProfilePage()
 
   const [error, setError] = useState("");
 
-  const canManage = user?.role === "Teacher";
+  const canManage = user?.role === USER_ROLES.TEACHER;
   const selectedChildId = selectedChildOption?.value;
 
   useEffect(() => {
@@ -464,27 +470,6 @@ function getChildLabel(child)
   const groupPart = child.groupName ? ` - ${child.groupName}` : " - bez grupe";
 
   return `${child.firstName} ${child.lastName}${groupPart}`;
-}
-
-function getTodayDateInputValue() 
-{
-  return new Date().toISOString().substring(0, 10);
-}
-
-function toDateInputValue(value) 
-{
-  if (!value)
-    return "";
-
-  return value.substring(0, 10);
-}
-
-function toUtcIsoDate(value) 
-{
-  if (!value)
-    return null;
-
-  return `${value}T00:00:00Z`;
 }
 
 function getErrorMessage(error) 

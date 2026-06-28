@@ -1,4 +1,5 @@
 import { FaEdit, FaPlus, FaSave, FaTimes, FaTrashAlt } from "react-icons/fa";
+import { formatDateTime } from "../../utils/formatters";
 
 function DevelopmentNotesSection({
   notes,
@@ -105,11 +106,6 @@ function DevelopmentNotesSection({
       </div>
     </div>
   );
-}
-
-function formatDateTime(value) 
-{
-  return new Date(value).toLocaleString("sr-RS");
 }
 
 export default DevelopmentNotesSection;

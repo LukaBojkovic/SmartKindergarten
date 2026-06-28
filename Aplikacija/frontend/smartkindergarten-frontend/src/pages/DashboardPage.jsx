@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { USER_ROLES } from "../constants/userRoles";
 
 import {
   FaBell,
@@ -17,36 +18,35 @@ function DashboardPage() {
   const { user } = useAuth();
 
   const cardsByRole = {
-    Administrator: [
-      { title: "Korisnici", text: "Upravljanje korisničkim nalozima.", path: "/users", icon: <FaUsers />},
-      { title: "Deca", text: "Pregled i upravljanje podacima o deci.", path: "/children", icon: <FaChild />},
-      { title: "Grupe", text: "Upravljanje vrtićkim grupama.", path: "/groups", icon: <FaLayerGroup />},
+    [USER_ROLES.ADMINISTRATOR]: [
+      { title: "Korisnici", text: "Nalozi zaposlenih i roditelja.", path: "/users", icon: <FaUsers />},
+      { title: "Deca", text: "Podaci o deci, grupama i roditeljima.", path: "/children", icon: <FaChild />},
+      { title: "Grupe", text: "Vrtićke grupe, deca i vaspitači.", path: "/groups", icon: <FaLayerGroup />},
       { title: "Razvojni profil", text: "Pregled razvojnih profila dece.", path: "/development-profile", icon: <FaChartLine />},
-      { title: "Prisustvo", text: "Pregled i evidencija prisustva.", path: "/attendance", icon: <FaCalendarCheck />},
+      { title: "Prisustvo", text: "Evidencija dolazaka dece.", path: "/attendance", icon: <FaCalendarCheck />},
       { title: "Dnevni izveštaji", text: "Pregled dnevnih izveštaja.", path: "/daily-reports",  icon: <FaClipboardList />},
       { title: "Obaveštenja", text: "Pregled i slanje obaveštenja.", path: "/notifications", icon: <FaBell />},
-      { title: "Finansije", text: "Pregled i upravljanje uplatama.", path: "/finance", icon: <FaMoneyBillWave />},
+      { title: "Finansije", text: "Uplate, zaduženja i mesečni izveštaji.", path: "/finance", icon: <FaMoneyBillWave />},
       { title: "Podešavanja", text: "Osnovna sistemska podešavanja.", path: "/system-settings", icon: <FaCog />},
     ],
-    Teacher: [
-      { title: "Deca", text: "Pregled dece iz dodeljenih grupa.", path: "/children", icon: <FaChild />},
-      { title: "Grupe", text: "Pregled dodeljenih grupa.", path: "/groups", icon: <FaLayerGroup />},
+    [USER_ROLES.TEACHER]: [
+      { title: "Deca", text: "Deca iz vaših grupa.", path: "/children", icon: <FaChild />},
+      { title: "Grupe", text: "Grupe u kojima radite.", path: "/groups", icon: <FaLayerGroup />},
       { title: "Razvojni profil", text: "Beleške, procene i napredak deteta.", path: "/development-profile", icon: <FaChartLine />},
       { title: "Prisustvo", text: "Evidencija prisustva dece.", path: "/attendance", icon: <FaCalendarCheck />},
       { title: "Dnevni izveštaji", text: "Kreiranje i pregled izveštaja.", path: "/daily-reports", icon: <FaClipboardList />},
       { title: "Obaveštenja", text: "Pregled i slanje obaveštenja.", path: "/notifications", icon: <FaBell />},
     ],
-    Parent: [
+    [USER_ROLES.PARENT]: [
       { title: "Razvojni profil", text: "Pregled razvoja deteta.", path: "/development-profile", icon: <FaChartLine />},
       { title: "Dnevni izveštaji", text: "Pregled dnevnih aktivnosti.", path: "/daily-reports", icon: <FaClipboardList />},
       { title: "Obaveštenja", text: "Pregled obaveštenja vrtića.", path: "/notifications", icon: <FaBell />},
       { title: "Finansije", text: "Pregled uplata i dugovanja.", path: "/finance", icon: <FaMoneyBillWave />},
     ],
-    AdministrativeStaff: [
-      { title: "Deca", text: "Administrativni pregled dece.", path: "/children", icon: <FaChild />},
-      { title: "Prisustvo", text: "Pregled evidencije prisustva.", path: "/attendance", icon: <FaCalendarCheck />},
+    [USER_ROLES.ADMINISTRATIVE_STAFF]: [
+      { title: "Deca", text: "Podaci o deci, grupama i roditeljima.", path: "/children", icon: <FaChild />},
       { title: "Obaveštenja", text: "Pregled i slanje obaveštenja.", path: "/notifications", icon: <FaBell />},
-      { title: "Finansije", text: "Upravljanje uplatama.", path: "/finance", icon: <FaMoneyBillWave />, },
+      { title: "Finansije", text: "Uplate i finansijski pregledi.", path: "/finance", icon: <FaMoneyBillWave />, },
     ],
   };
 

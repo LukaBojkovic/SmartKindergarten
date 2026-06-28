@@ -8,6 +8,8 @@ import { useAuth } from "../hooks/useAuth";
 import { FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConfirm } from "../hooks/useConfirm";
+import { USER_ROLES } from "../constants/userRoles";
+import { getTodayDateInputValue, toUtcIsoDate } from "../utils/dateUtils";
 
 function AttendancePage() {
   const { user } = useAuth();
@@ -25,8 +27,7 @@ function AttendancePage() {
 
   const [error, setError] = useState("");
 
-  const canManage =
-    user?.role === "Administrator" || user?.role === "Teacher";
+  const canManage = user?.role === USER_ROLES.TEACHER;
 
   const selectedGroupId = selectedGroupOption?.value;
 
@@ -262,18 +263,6 @@ function AttendancePage() {
       />
     </div>
   );
-}
-
-function getTodayDateInputValue() {
-  return new Date().toISOString().substring(0, 10);
-}
-
-function toUtcIsoDate(value) {
-  if (!value) {
-    return null;
-  }
-
-  return `${value}T00:00:00Z`;
 }
 
 function getErrorMessage(error) {

@@ -239,12 +239,23 @@ namespace SmartKindergarten.Api.Services
             int senderId,
             string currentUserRole)
         {
-            if (currentUserRole == UserRole.Administrator.ToString() ||
-                currentUserRole == UserRole.AdministrativeStaff.ToString())
+            if (currentUserRole == UserRole.Administrator.ToString())
             {
                 return await _context.Users
                     .Where(u => u.IsActive && u.Id != senderId)
                     .Select(u => u.Id)
+                    .ToListAsync();
+            }
+
+            if (currentUserRole == UserRole.AdministrativeStaff.ToString())
+            {
+                return await _context.ParentChildren
+                    .Where(pc =>
+                        pc.Child.IsActive &&
+                        pc.Parent.IsActive &&
+                        pc.Parent.Role == UserRole.Parent)
+                    .Select(pc => pc.ParentId)
+                    .Distinct()
                     .ToListAsync();
             }
 

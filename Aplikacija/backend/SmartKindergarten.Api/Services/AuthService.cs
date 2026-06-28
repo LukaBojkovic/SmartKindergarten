@@ -20,7 +20,7 @@ namespace SmartKindergarten.Api.Services
             _configuration = configuration;
         }
 
-        public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
+        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
             User? user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username && u.IsActive);
 
@@ -37,6 +37,7 @@ namespace SmartKindergarten.Api.Services
                 Token = token,
                 UserId = user.Id,
                 Username = user.Username,
+                Email = user.Email,
                 FullName = $"{user.FirstName} {user.LastName}",
                 Role = user.Role.ToString()
             };

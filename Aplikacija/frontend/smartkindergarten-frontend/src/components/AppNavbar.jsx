@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import systemSettingsApi from "../api/systemSettingsApi";
+import { SYSTEM_SETTING_KEYS } from "../constants/systemSettingKeys";
+import { USER_ROLES } from "../constants/userRoles";
 
 import {
   FaBell,
@@ -19,7 +21,7 @@ import {
 } from "react-icons/fa";
 
 const NAV_LINKS_BY_ROLE = {
-  Administrator: [
+  [USER_ROLES.ADMINISTRATOR]: [
     { to: "/users", label: "Korisnici", icon: <FaUsers/>},
     { to: "/children", label: "Deca", icon: <FaChild/> },
     { to: "/groups", label: "Grupe", icon: <FaLayerGroup />  },
@@ -31,7 +33,7 @@ const NAV_LINKS_BY_ROLE = {
     { to: "/system-settings", label: "Podešavanja", icon: <FaCog /> },
   ],
 
-  Teacher: [
+  [USER_ROLES.TEACHER]: [
     { to: "/children", label: "Deca", icon: <FaChild /> },
     { to: "/groups", label: "Grupe", icon: <FaLayerGroup /> },
     { to: "/development-profile", label: "Razvojni profil", icon: <FaChartLine /> },
@@ -40,16 +42,15 @@ const NAV_LINKS_BY_ROLE = {
     { to: "/notifications", label: "Obaveštenja", icon: <FaBell /> },
   ],
 
-  Parent: [
+  [USER_ROLES.PARENT]: [
     { to: "/development-profile", label: "Razvojni profil", icon: <FaChartLine /> },
     { to: "/daily-reports", label: "Dnevni izveštaji", icon: <FaClipboardList /> },
     { to: "/notifications", label: "Obaveštenja", icon: <FaBell /> },
     { to: "/finance", label: "Finansije", icon: <FaMoneyBillWave /> },
   ],
 
-  AdministrativeStaff: [
+  [USER_ROLES.ADMINISTRATIVE_STAFF]: [
     { to: "/children", label: "Deca", icon: <FaChild /> },
-    { to: "/attendance", label: "Prisustvo", icon: <FaCalendarCheck /> },
     { to: "/notifications", label: "Obaveštenja", icon: <FaBell /> },
     { to: "/finance", label: "Finansije", icon: <FaMoneyBillWave /> },
   ],
@@ -74,7 +75,7 @@ function AppNavbar() {
 
     const loadKindergartenName = () => {
     systemSettingsApi
-      .getByKey("KindergartenName")
+      .getByKey(SYSTEM_SETTING_KEYS.KINDERGARTEN_NAME)
       .then((setting) => {
         if (!isCancelled && setting.value) {
           setKindergartenName(setting.value);

@@ -123,11 +123,10 @@ namespace SmartKindergarten.Api.Services
             if (report == null)
                 return (false, "Dnevni izveštaj nije pronađen.", null);
 
-            bool isAdmin = currentUserRole == UserRole.Administrator.ToString();
             bool isReportTeacher = currentUserRole == UserRole.Teacher.ToString() &&
-                                   report.TeacherId == currentUserId;
+                await _context.TeacherGroups.AnyAsync(tg => tg.TeacherId == currentUserId && tg.GroupId == report.GroupId);
 
-            if (!isAdmin && !isReportTeacher)
+            if (!isReportTeacher)
                 return (false, "Nemate pravo da menjate ovaj dnevni izveštaj.", null);
 
             if (string.IsNullOrWhiteSpace(request.Title))
@@ -159,11 +158,11 @@ namespace SmartKindergarten.Api.Services
             if (report == null)
                 return (false, "Dnevni izveštaj nije pronađen.");
 
-            bool isAdmin = currentUserRole == UserRole.Administrator.ToString();
             bool isReportTeacher = currentUserRole == UserRole.Teacher.ToString() &&
-                                   report.TeacherId == currentUserId;
+                await _context.TeacherGroups.AnyAsync(tg => tg.TeacherId == currentUserId && 
+                tg.GroupId == report.GroupId);
 
-            if (!isAdmin && !isReportTeacher)
+            if (!isReportTeacher)
                 return (false, "Nemate pravo da obrišete ovaj dnevni izveštaj.");
 
             _context.DailyReports.Remove(report);
@@ -178,8 +177,7 @@ namespace SmartKindergarten.Api.Services
         {
             IQueryable<DailyReport> query = _context.DailyReports.AsQueryable();
 
-            if (currentUserRole == UserRole.Administrator.ToString() ||
-                currentUserRole == UserRole.AdministrativeStaff.ToString())
+            if (currentUserRole == UserRole.Administrator.ToString())
             {
                 return query;
             }
@@ -208,8 +206,7 @@ namespace SmartKindergarten.Api.Services
             int currentUserId,
             string currentUserRole)
         {
-            if (currentUserRole == UserRole.Administrator.ToString() ||
-                currentUserRole == UserRole.AdministrativeStaff.ToString())
+            if (currentUserRole == UserRole.Administrator.ToString())
             {
                 return await _context.KindergartenGroups.AnyAsync(g => g.Id == groupId);
             }

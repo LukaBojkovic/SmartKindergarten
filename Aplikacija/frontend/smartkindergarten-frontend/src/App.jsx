@@ -14,6 +14,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import FinancePage from "./pages/FinancePage";
 import SystemSettingsPage from "./pages/SystemSettingsPage";
 import AccountPage from "./pages/AccountPage";
+import { USER_ROLES } from "./constants/userRoles";
 
 function App() {
   return (
@@ -49,10 +50,10 @@ function App() {
           element={
             <ProtectedRoute
               allowedRoles={[
-                "Administrator",
-                "Teacher",
-                "Parent",
-                "AdministrativeStaff",]}>
+                USER_ROLES.ADMINISTRATOR,
+                USER_ROLES.TEACHER,
+                USER_ROLES.PARENT,
+                USER_ROLES.ADMINISTRATIVE_STAFF,]}>
               <AccountPage />
             </ProtectedRoute>
           }
@@ -62,7 +63,7 @@ function App() {
           path="/users"
           element={
             <ProtectedRoute allowedRoles={[
-              "Administrator"
+              USER_ROLES.ADMINISTRATOR
               ]}>
               <UsersPage
                 title="Korisnici"
@@ -77,9 +78,9 @@ function App() {
           element={
             <ProtectedRoute
               allowedRoles={[
-                "Administrator",
-                "Teacher",
-                "AdministrativeStaff",
+                USER_ROLES.ADMINISTRATOR,
+                USER_ROLES.TEACHER,
+                USER_ROLES.ADMINISTRATIVE_STAFF,
               ]}
             >
               <ChildrenPage
@@ -93,7 +94,9 @@ function App() {
         <Route
           path="/groups"
           element={
-            <ProtectedRoute allowedRoles={["Administrator", "Teacher"]}>
+            <ProtectedRoute
+              allowedRoles={[USER_ROLES.ADMINISTRATOR, USER_ROLES.TEACHER]}
+            >
               <GroupsPage
                 title="Grupe"
                 description="Pregled i upravljanje vrtićkim grupama."
@@ -106,9 +109,9 @@ function App() {
           path="/development-profile"
           element={
             <ProtectedRoute allowedRoles={[
-              "Administrator",
-              "Teacher",
-               "Parent",
+              USER_ROLES.ADMINISTRATOR,
+              USER_ROLES.TEACHER,
+               USER_ROLES.PARENT,
                ]}>
               <DevelopmentProfilePage
                 title="Razvojni profil deteta"
@@ -122,9 +125,8 @@ function App() {
           path="/attendance"
           element={ 
             <ProtectedRoute allowedRoles={[
-              "Administrator",
-              "Teacher",
-              "AdministrativeStaff",
+              USER_ROLES.ADMINISTRATOR,
+              USER_ROLES.TEACHER,
               ]}>
               <AttendancePage
                 title="Prisustvo"
@@ -138,10 +140,9 @@ function App() {
           path="/daily-reports"
           element={
             <ProtectedRoute allowedRoles={[
-               "Administrator",
-               "Teacher",
-               "Parent",
-               "AdministrativeStaff",
+               USER_ROLES.ADMINISTRATOR,
+               USER_ROLES.TEACHER,
+               USER_ROLES.PARENT,
                ]}>
               <DailyReportsPage
                 title="Dnevni izveštaji"
@@ -155,10 +156,10 @@ function App() {
           path="/notifications"
           element={
             <ProtectedRoute allowedRoles={[
-              "Administrator",
-              "Teacher", 
-              "Parent", 
-              "AdministrativeStaff"
+              USER_ROLES.ADMINISTRATOR,
+              USER_ROLES.TEACHER, 
+              USER_ROLES.PARENT, 
+              USER_ROLES.ADMINISTRATIVE_STAFF
               ]}>
               <NotificationsPage
                 title="Obaveštenja"
@@ -172,9 +173,9 @@ function App() {
           path="/finance"
           element={
             <ProtectedRoute allowedRoles={[
-              "Parent", 
-              "AdministrativeStaff", 
-              "Administrator"]}>
+              USER_ROLES.PARENT, 
+              USER_ROLES.ADMINISTRATIVE_STAFF, 
+              USER_ROLES.ADMINISTRATOR]}>
               <FinancePage
                 title="Finansije"
                 description="Pregled uplata i finansijskog statusa deteta."
@@ -187,8 +188,7 @@ function App() {
           path="/system-settings"
           element={
             <ProtectedRoute allowedRoles={[
-              "Administrator",
-              "AdministrativeStaff",
+              USER_ROLES.ADMINISTRATOR,
               ]}>
               <SystemSettingsPage
                 title="Sistemska podešavanja"

@@ -4,9 +4,8 @@ import { FaSave } from "react-icons/fa";
 import systemSettingsApi from "../api/systemSettingsApi";
 import { useAuth } from "../hooks/useAuth";
 import { toast } from "react-toastify";
-
-const MONTHLY_FEE_KEY = "MonthlyFee";
-const KINDERGARTEN_NAME_KEY = "KindergartenName";
+import { SYSTEM_SETTING_KEYS } from "../constants/systemSettingKeys";
+import { USER_ROLES } from "../constants/userRoles";
 
 function SystemSettingsPage() {
   const { user } = useAuth();
@@ -23,7 +22,7 @@ function SystemSettingsPage() {
 
   const [error, setError] = useState("");
 
-  const canManage = user?.role === "Administrator";
+  const canManage = user?.role === USER_ROLES.ADMINISTRATOR;
 
   const loadSettings = async () => {
     setIsLoading(true);
@@ -43,7 +42,9 @@ function SystemSettingsPage() {
 
   const loadMonthlyFee = async () => {
     try {
-      const setting = await systemSettingsApi.getByKey(MONTHLY_FEE_KEY);
+      const setting = await systemSettingsApi.getByKey(
+        SYSTEM_SETTING_KEYS.MONTHLY_FEE
+      );
 
       setMonthlyFeeSettingId(setting.id);
       setMonthlyFee(setting.value);
@@ -59,7 +60,9 @@ function SystemSettingsPage() {
 
   const loadKindergartenName = async () => {
     try {
-      const setting = await systemSettingsApi.getByKey(KINDERGARTEN_NAME_KEY);
+      const setting = await systemSettingsApi.getByKey(
+        SYSTEM_SETTING_KEYS.KINDERGARTEN_NAME
+      );
 
       setKindergartenNameSettingId(setting.id);
       setKindergartenName(setting.value);
@@ -101,14 +104,14 @@ function SystemSettingsPage() {
     try {
       const savedKindergartenName = await saveSetting({
         id: kindergartenNameSettingId,
-        key: KINDERGARTEN_NAME_KEY,
+        key: SYSTEM_SETTING_KEYS.KINDERGARTEN_NAME,
         value: trimmedKindergartenName,
         description: "Naziv predškolske ustanove koji se prikazuje u aplikaciji.",
       });
 
       const savedMonthlyFee = await saveSetting({
         id: monthlyFeeSettingId,
-        key: MONTHLY_FEE_KEY,
+        key: SYSTEM_SETTING_KEYS.MONTHLY_FEE,
         value: String(parsedMonthlyFee),
         description: "Iznos mesečne članarine po detetu.",
       });
@@ -147,7 +150,7 @@ function SystemSettingsPage() {
     : "Pregled osnovnih podešavanja aplikacije.";
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 system-settings-page">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
           <h1>Sistemska podešavanja</h1>

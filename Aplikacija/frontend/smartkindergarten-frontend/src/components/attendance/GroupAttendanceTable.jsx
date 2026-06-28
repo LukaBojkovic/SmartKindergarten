@@ -1,4 +1,5 @@
 import { FaTrashAlt } from "react-icons/fa";
+import { formatDate } from "../../utils/formatters";
 
 function GroupAttendanceTable({
   attendance,
@@ -124,11 +125,6 @@ function GroupAttendanceTable({
           </table>
         </div>
 
-        {!canManage && (
-          <div className="alert alert-secondary mb-0">
-            Imate pravo pregleda prisustva, ali ne i evidentiranja izmena.
-          </div>
-        )}
       </div>
     </div>
   );
@@ -136,10 +132,6 @@ function GroupAttendanceTable({
 
 function getRecordedCount(children) {
   return children.filter((child) => child.isRecorded).length;
-}
-
-function formatDate(value) {
-  return new Date(value).toLocaleDateString("sr-RS");
 }
 
 export default GroupAttendanceTable;

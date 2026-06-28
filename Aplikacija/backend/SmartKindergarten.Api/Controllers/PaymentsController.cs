@@ -35,6 +35,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator,AdministrativeStaff,Parent")]
         public async Task<ActionResult<PaymentResponseDto>> GetById(int id)
         {
             var currentUserId = GetCurrentUserId();
@@ -56,6 +57,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("child/{childId}")]
+        [Authorize(Roles = "Administrator,AdministrativeStaff,Parent")]
         public async Task<ActionResult<List<PaymentResponseDto>>> GetByChild(int childId)
         {
             var currentUserId = GetCurrentUserId();
@@ -78,6 +80,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("child/{childId}/status")]
+        [Authorize(Roles = "Administrator,AdministrativeStaff,Parent")]
         public async Task<ActionResult<ChildFinanceStatusDto>> GetChildFinanceStatus(
             int childId,
             [FromQuery] decimal? expectedAmount)
@@ -120,7 +123,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrator,AdministrativeStaff")]
+        [Authorize(Roles = "AdministrativeStaff")]
         public async Task<ActionResult<PaymentResponseDto>> Create(CreatePaymentRequestDto request)
         {
             if (request.Amount <= 0)
@@ -163,7 +166,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrator,AdministrativeStaff")]
+        [Authorize(Roles = "AdministrativeStaff")]
         public async Task<ActionResult<PaymentResponseDto>> Update(
             int id,
             UpdatePaymentRequestDto request)
@@ -196,7 +199,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrator,AdministrativeStaff")]
+        [Authorize(Roles = "AdministrativeStaff")]
         public async Task<IActionResult> Delete(int id)
         {
             var payment = await _context.Payments.FindAsync(id);

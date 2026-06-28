@@ -1,14 +1,17 @@
-import { FaPaperPlane, FaSave, FaTimes } from "react-icons/fa";
+import { FaPaperPlane, FaSave, FaTimes, FaUsers } from "react-icons/fa";
 import Select from "react-select";
 
 function NotificationForm({
   form,
   selectedRecipients,
   recipientOptions,
+  recipientGroupOptions,
+  recipientGroupFilter,
   editingNotificationId,
   isSaving,
   onChange,
   onRecipientsChange,
+  onRecipientGroupFilterChange,
   onSelectAllRecipients,
   onClearRecipients,
   onSubmit,
@@ -49,6 +52,25 @@ function NotificationForm({
 
           <div className="mb-3">
             <label className="form-label">Primaoci</label>
+            {!editingNotificationId && recipientGroupOptions.length > 0 && (
+              <div className="mb-2">
+                <select
+                  className="form-select"
+                  value={recipientGroupFilter}
+                  onChange={(event) =>
+                    onRecipientGroupFilterChange(event.target.value)
+                  }
+                >
+                  <option value="">Sve moje grupe</option>
+                  {recipientGroupOptions.map((groupOption) => (
+                    <option key={groupOption.value} value={groupOption.value}>
+                      {groupOption.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <Select
               value={selectedRecipients}
               onChange={onRecipientsChange}
@@ -65,6 +87,7 @@ function NotificationForm({
               onClick={onSelectAllRecipients}
               disabled={recipientOptions.length === 0}
             >
+              <FaUsers className="me-2" />
               Izaberi sve dostupne primaoce
             </button>
 
@@ -74,6 +97,7 @@ function NotificationForm({
               onClick={onClearRecipients}
               disabled={selectedRecipients.length === 0}
             >
+              <FaTimes className="me-2" />
               Poništi izbor
             </button>
           </div>

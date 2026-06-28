@@ -19,6 +19,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("children/{childId}/notes")]
+        [Authorize(Roles = "Administrator,Teacher,Parent")]
         public async Task<ActionResult<List<DevelopmentNoteResponseDto>>> GetNotes(int childId)
         {
             var result = await _developmentProfileService.GetNotesAsync(childId, GetCurrentUserId(), GetCurrentUserRole());
@@ -68,6 +69,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("children/{childId}/assessments")]
+        [Authorize(Roles = "Administrator,Teacher,Parent")]
         public async Task<ActionResult<List<DevelopmentAssessmentResponseDto>>> 
             GetAssessments(int childId, [FromQuery] string? area)
         {
@@ -119,6 +121,7 @@ namespace SmartKindergarten.Api.Controllers
         }
 
         [HttpGet("children/{childId}/progress")]
+        [Authorize(Roles = "Administrator,Teacher,Parent")]
         public async Task<ActionResult<List<DevelopmentProgressPointDto>>> GetProgress(int childId, [FromQuery] string? area)
         {
             var result = await _developmentProfileService

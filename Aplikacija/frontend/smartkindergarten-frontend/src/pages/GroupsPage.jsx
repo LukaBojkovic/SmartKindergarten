@@ -10,6 +10,7 @@ import { useAuth } from "../hooks/useAuth";
 import { FaSearch, FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConfirm } from "../hooks/useConfirm";
+import { USER_ROLES } from "../constants/userRoles";
 
 const initialCreateForm = {
   name: "",
@@ -44,7 +45,7 @@ function GroupsPage()
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const canManage = user?.role === "Administrator";
+  const canManage = user?.role === USER_ROLES.ADMINISTRATOR;
 
   useEffect(() => {
     let isCancelled = false;
@@ -93,7 +94,7 @@ function GroupsPage()
 
     Promise.all([
       childrenApi.getAll({ search: "", groupId: "", isActive: "true" }),
-      usersApi.getAll({ role: "Teacher", isActive: "true" }),
+      usersApi.getAll({ role: USER_ROLES.TEACHER, isActive: "true" }),
     ])
       .then(([childrenData, teachersData]) => {
         if (!isCancelled) {
@@ -414,8 +415,8 @@ function GroupsPage()
   }));
 
   const pageDescription = canManage
-    ? "Pregled i upravljanje vrtićkim grupama, decom i vaspitačima."
-    : "Pregled vrtićkih grupa kojima imate pristup.";
+    ? "Vrtićke grupe, deca i vaspitači na jednom mestu."
+    : "Grupe u kojima radite, sa osnovnim podacima o deci i vaspitačima.";
 
   return (
     <div className="container mt-4">

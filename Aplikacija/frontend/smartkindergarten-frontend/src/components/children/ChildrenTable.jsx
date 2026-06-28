@@ -1,4 +1,5 @@
 import { FaEdit, FaTrashAlt, FaUsers } from "react-icons/fa";
+import { formatDate } from "../../utils/formatters";
 
 function ChildrenTable({
    childrenList,
@@ -128,14 +129,6 @@ function ChildrenTable({
       </table>
     </div>
   );
-}
-
-function formatDate(dateValue)
-{
-  if (!dateValue)
-    return "";
-
-  return new Date(dateValue).toLocaleDateString("sr-RS");
 }
 
 export default ChildrenTable;

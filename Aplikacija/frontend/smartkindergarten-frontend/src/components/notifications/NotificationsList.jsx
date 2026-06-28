@@ -1,4 +1,6 @@
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaCheck, FaEdit, FaTrashAlt } from "react-icons/fa";
+import { USER_ROLES } from "../../constants/userRoles";
+import { formatDateTime } from "../../utils/formatters";
 
 function NotificationsList({
   notifications,
@@ -28,8 +30,9 @@ function NotificationsList({
         const isRead = myRecipient?.isRead ?? false;
         const canMarkAsRead = myRecipient && !isRead;
         const canModify =
-          userRole === "Administrator" ||
+          userRole === USER_ROLES.ADMINISTRATOR ||
           Number(notification.senderId) === Number(currentUserId);
+        const canViewRecipients = userRole !== USER_ROLES.PARENT;
 
         return (
           <div key={notification.id} className="card shadow-sm">
@@ -57,7 +60,18 @@ function NotificationsList({
                   </div>
                 </div>
 
-                {(canMarkAsRead || canModify) && (
+                {canMarkAsRead && !canModify && (
+                  <button
+                    className="btn btn-sm btn-outline-primary text-nowrap"
+                    type="button"
+                    onClick={() => onMarkAsRead(notification)}
+                  >
+                    <FaCheck className="me-2" />
+                    Označi kao pročitano
+                  </button>
+                )}
+
+                {canModify && (
                   <div className="dropdown">
                     <button
                       className="btn btn-sm btn-outline-primary dropdown-toggle"
@@ -75,6 +89,7 @@ function NotificationsList({
                             type="button"
                             onClick={() => onMarkAsRead(notification)}
                           >
+                            <FaCheck className="me-2" />
                             Označi kao pročitano
                           </button>
                         </li>
@@ -118,6 +133,7 @@ function NotificationsList({
 
               <p className="card-text">{notification.content}</p>
 
+              {canViewRecipients && (
               <div className="mt-3">
                 <small className="text-muted">
                   Primaoci:{" "}
@@ -126,6 +142,7 @@ function NotificationsList({
                     .join(", ")}
                 </small>
               </div>
+              )}
             </div>
           </div>
         );
@@ -138,14 +155,6 @@ function getMyRecipient(notification, currentUserId) {
   return notification.recipients.find(
     (recipient) => Number(recipient.userId) === Number(currentUserId)
   );
-}
-
-function formatDateTime(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Date(value).toLocaleString("sr-RS");
 }
 
 export default NotificationsList;

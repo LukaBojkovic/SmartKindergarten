@@ -291,8 +291,7 @@ namespace SmartKindergarten.Api.Services
 
         private async Task<bool> CanViewChildAsync(int childId, int currentUserId, string currentUserRole)
         {
-            if (currentUserRole == UserRole.Administrator.ToString() ||
-                currentUserRole == UserRole.AdministrativeStaff.ToString())
+            if (currentUserRole == UserRole.Administrator.ToString())
             {
                 return await _context.Children.AnyAsync(c => c.Id == childId);
             }

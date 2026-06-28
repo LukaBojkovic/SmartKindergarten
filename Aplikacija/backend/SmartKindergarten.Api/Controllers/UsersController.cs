@@ -101,11 +101,15 @@ namespace SmartKindergarten.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Deactivate(int id)
         {
-            bool success = await _userService.DeactivateAsync(id);
+            var result = await _userService.DeactivateAsync(id);
 
-            if (!success)
-                return NotFound("Korisnik nije pronađen.");
+            if (!result.Success)
+            {
+                if (result.Error == "Korisnik nije pronađen.")
+                    return NotFound(result.Error);
 
+                return BadRequest(result.Error);
+            }
 
             return NoContent();
         }

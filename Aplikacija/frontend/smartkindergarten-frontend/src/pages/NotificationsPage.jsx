@@ -6,15 +6,20 @@ import usersApi from "../api/usersApi";
 import NotificationForm from "../components/notifications/NotificationForm";
 import NotificationsFilters from "../components/notifications/NotificationsFilters";
 import NotificationsList from "../components/notifications/NotificationsList";
+import PaginationControls from "../components/common/PaginationControls";
 import { useAuth } from "../hooks/useAuth";
 import { FaPlus, FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConfirm } from "../hooks/useConfirm";
+import { USER_ROLES } from "../constants/userRoles";
+import { getTotalPages, paginateItems } from "../utils/paginationUtils";
 
 const initialForm = {
   title: "",
   content: "",
 };
+
+const PAGE_SIZE = 10;
 
 function NotificationsPage() {
   const { user } = useAuth();
@@ -22,18 +27,18 @@ function NotificationsPage() {
 
   const [notifications, setNotifications] = useState([]);
   const [recipientOptions, setRecipientOptions] = useState([]);
+  const [recipientChildren, setRecipientChildren] = useState([]);
 
   const [form, setForm] = useState(initialForm);
   const [selectedRecipients, setSelectedRecipients] = useState([]);
+  const [recipientGroupFilter, setRecipientGroupFilter] = useState("");
   const [editingNotificationId, setEditingNotificationId] = useState(null);
   const [isNotificationFormVisible, setIsNotificationFormVisible] =
   useState(false);
 
-  const [scope, setScope] = useState(
-    user?.role === "Administrator" ? "all" : "my"
-  );
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [searchFilter, setSearchFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
   const [isLoadingRecipients, setIsLoadingRecipients] = useState(false);
@@ -42,21 +47,19 @@ function NotificationsPage() {
   const [error, setError] = useState("");
 
   const currentUserId = getCurrentUserId(user);
-  const isAdmin = user?.role === "Administrator";
+  const isAdmin = user?.role === USER_ROLES.ADMINISTRATOR;
+  const isTeacher = user?.role === USER_ROLES.TEACHER;
   const canSend =
-    user?.role === "Administrator" ||
-    user?.role === "Teacher" ||
-    user?.role === "AdministrativeStaff";
+    user?.role === USER_ROLES.ADMINISTRATOR ||
+    user?.role === USER_ROLES.TEACHER ||
+    user?.role === USER_ROLES.ADMINISTRATIVE_STAFF;
 
   useEffect(() => {
     let isCancelled = false;
 
     setIsLoadingNotifications(true);
 
-    const request =
-      isAdmin && scope === "all"
-        ? notificationsApi.getAll()
-        : notificationsApi.getMy();
+    const request = isAdmin ? notificationsApi.getAll() : notificationsApi.getMy();
 
     request
       .then((data) => {
@@ -79,7 +82,7 @@ function NotificationsPage() {
     return () => {
       isCancelled = true;
     };
-  }, [isAdmin, scope]);
+  }, [isAdmin]);
 
   useEffect(() => {
   if (!canSend) {
@@ -90,16 +93,23 @@ function NotificationsPage() {
 
   setIsLoadingRecipients(true);
 
-  const isAdministrator = user?.role === "Administrator";
+  const isAdministrator = user?.role === USER_ROLES.ADMINISTRATOR;
 
   const request = isAdministrator
     ? loadAdminRecipientOptions(currentUserId)
-    : loadParentRecipientOptions();
+    : loadParentRecipientData();
 
   request
-    .then((options) => {
+    .then((recipientData) => {
       if (!isCancelled) {
-        setRecipientOptions(options);
+        if (isAdministrator) {
+          setRecipientOptions(recipientData);
+          setRecipientChildren([]);
+          return;
+        }
+
+        setRecipientOptions(recipientData.options);
+        setRecipientChildren(recipientData.children);
       }
     })
     .catch((requestError) => {
@@ -118,6 +128,14 @@ function NotificationsPage() {
   };
 }, [canSend, user?.role, currentUserId]);
 
+  const recipientGroupOptions = useMemo(() => {
+    if (!isTeacher) {
+      return [];
+    }
+
+    return getRecipientGroupOptions(recipientChildren);
+  }, [isTeacher, recipientChildren]);
+
   const filteredNotifications = useMemo(() => {
     return notifications.filter((notification) => {
       const normalizedSearch = searchFilter.trim().toLowerCase();
@@ -132,21 +150,48 @@ function NotificationsPage() {
         (recipient) => Number(recipient.userId) === Number(currentUserId)
       );
 
-      const matchesUnread = !unreadOnly || (myRecipient && !myRecipient.isRead);
+      const matchesUnread =
+        isAdmin || !unreadOnly || (myRecipient && !myRecipient.isRead);
 
       return matchesSearch && matchesUnread;
     });
-  }, [notifications, searchFilter, unreadOnly, currentUserId]);
+  }, [notifications, searchFilter, unreadOnly, currentUserId, isAdmin]);
+
+  const totalPages = getTotalPages(filteredNotifications.length, PAGE_SIZE);
+  const paginatedNotifications = paginateItems(
+    filteredNotifications,
+    currentPage,
+    PAGE_SIZE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [unreadOnly, searchFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    if (!isTeacher || editingNotificationId) {
+      return;
+    }
+
+    setSelectedRecipients(
+      getParentRecipientOptions(recipientChildren, recipientGroupFilter)
+    );
+  }, [editingNotificationId, isTeacher, recipientChildren, recipientGroupFilter]);
 
   const loadNotifications = async () => {
     setIsLoadingNotifications(true);
     setError("");
 
     try {
-      const data =
-        isAdmin && scope === "all"
-          ? await notificationsApi.getAll()
-          : await notificationsApi.getMy();
+      const data = isAdmin
+        ? await notificationsApi.getAll()
+        : await notificationsApi.getMy();
 
       setNotifications(data);
     } catch (requestError) {
@@ -159,7 +204,10 @@ function NotificationsPage() {
   const openCreateNotificationForm = () => {
   setEditingNotificationId(null);
   setForm(initialForm);
-  setSelectedRecipients([]);
+  setRecipientGroupFilter("");
+  setSelectedRecipients(
+    isTeacher ? getParentRecipientOptions(recipientChildren, "") : []
+  );
 
   setIsNotificationFormVisible(true);
   setError("");
@@ -284,20 +332,17 @@ function NotificationsPage() {
   const resetForm = () => {
     setEditingNotificationId(null);
     setForm(initialForm);
+    setRecipientGroupFilter("");
     setSelectedRecipients([]);
   };
 
   const clearFilters = () => {
     setUnreadOnly(false);
     setSearchFilter("");
-
-    if (isAdmin) {
-      setScope("all");
-    }
   };
 
   const pageDescription = canSend
-    ? "Pregled primljenih obaveštenja i slanje novih obaveštenja korisnicima."
+    ? "Primljena obaveštenja i poruke koje šaljete korisnicima."
     : "Pregled obaveštenja koja su vam poslata.";
 
     const selectAllRecipients = () => {
@@ -349,10 +394,13 @@ function NotificationsPage() {
             form={form}
             selectedRecipients={selectedRecipients}
             recipientOptions={recipientOptions}
+            recipientGroupOptions={recipientGroupOptions}
+            recipientGroupFilter={recipientGroupFilter}
             editingNotificationId={editingNotificationId}
             isSaving={isSaving}
             onChange={handleFormChange}
             onRecipientsChange={setSelectedRecipients}
+            onRecipientGroupFilterChange={setRecipientGroupFilter}
             onSelectAllRecipients={selectAllRecipients}
             onClearRecipients={clearRecipients}
             onSubmit={handleSubmit}
@@ -363,23 +411,27 @@ function NotificationsPage() {
 
       <NotificationsFilters
         isAdmin={isAdmin}
-        scope={scope}
         unreadOnly={unreadOnly}
         searchFilter={searchFilter}
-        onScopeChange={setScope}
         onUnreadOnlyChange={setUnreadOnly}
         onSearchFilterChange={setSearchFilter}
         onClearFilters={clearFilters}
       />
 
       <NotificationsList
-        notifications={filteredNotifications}
+        notifications={paginatedNotifications}
         isLoading={isLoadingNotifications}
         currentUserId={currentUserId}
         userRole={user?.role}
         onMarkAsRead={markAsRead}
         onStartEdit={startEdit}
         onDelete={deleteNotification}
+      />
+
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
       />
     </div>
   );
@@ -399,31 +451,75 @@ async function loadAdminRecipientOptions(currentUserId) {
     }));
 }
 
-async function loadParentRecipientOptions() {
+async function loadParentRecipientData() {
   const children = await childrenApi.getAll({
     search: "",
     groupId: "",
     isActive: "true",
   });
 
-  const parentMap = new Map();
+  return {
+    children,
+    options: getParentRecipientOptions(children, ""),
+  };
+}
+
+function getRecipientGroupOptions(children) {
+  const groupMap = new Map();
 
   children.forEach((child) => {
+    if (!child.groupId) {
+      return;
+    }
+
+    groupMap.set(String(child.groupId), child.groupName || `Grupa ${child.groupId}`);
+  });
+
+  return Array.from(groupMap.entries()).map(([value, label]) => ({
+    value,
+    label,
+  }));
+}
+
+function getParentRecipientOptions(children, groupId) {
+  const parentMap = new Map();
+
+  children
+    .filter((child) => !groupId || String(child.groupId) === String(groupId))
+    .forEach((child) => {
     child.parents.forEach((parent) => {
       const parentId = parent.id ?? parent.parentId;
+      const childLabel = `${child.firstName} ${child.lastName}`;
+      const groupLabel = child.groupName || "bez grupe";
 
       if (!parentMap.has(parentId)) {
         parentMap.set(parentId, {
           value: parentId,
-          label: parent.email
-            ? `${parent.fullName} - ${parent.email}`
-            : parent.fullName,
+          fullName: parent.fullName,
+          email: parent.email,
+          children: [{ childLabel, groupLabel }],
         });
+        return;
       }
+
+      parentMap.get(parentId).children.push({ childLabel, groupLabel });
     });
   });
 
-  return Array.from(parentMap.values());
+  return Array.from(parentMap.values()).map((parent) => ({
+    value: parent.value,
+    label: getParentRecipientLabel(parent),
+  }));
+}
+
+function getParentRecipientLabel(parent) {
+  if (parent.children.length === 1) {
+    const child = parent.children[0];
+
+    return `${parent.fullName} - roditelj: ${child.childLabel}, ${child.groupLabel}`;
+  }
+
+  return parent.email ? `${parent.fullName} - ${parent.email}` : parent.fullName;
 }
 
 function getCurrentUserId(user) {

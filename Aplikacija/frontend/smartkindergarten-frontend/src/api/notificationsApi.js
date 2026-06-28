@@ -13,12 +13,6 @@ const notificationsApi = {
     return response.data;
   },
 
-  getUnread: async () => {
-    const response = await axiosClient.get("/notifications/unread");
-
-    return response.data;
-  },
-
   getById: async (id) => {
     const response = await axiosClient.get(`/notifications/${id}`);
 

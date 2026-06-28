@@ -4,6 +4,7 @@ import {
   developmentAreas,
   getDevelopmentAreaLabel,
 } from "../../constants/developmentAreas";
+import { formatDate } from "../../utils/formatters";
 
 function DevelopmentAssessmentsSection({
   assessments,
@@ -124,7 +125,7 @@ function DevelopmentAssessmentsSection({
         )}
 
         <div className="table-responsive">
-          <table className="table table-striped table-hover align-middle">
+          <table className="table table-striped table-hover align-middle development-assessments-table">
             <thead>
               <tr>
                 <th>Datum</th>
@@ -132,7 +133,11 @@ function DevelopmentAssessmentsSection({
                 <th>Ocena</th>
                 <th>Vaspitač</th>
                 <th>Komentar</th>
-                {canManage && <th className="text-end">Akcije</th>}
+                {canManage && (
+                  <th className="text-end development-assessments-actions-cell">
+                    Akcije
+                  </th>
+                )}
               </tr>
             </thead>
 
@@ -161,9 +166,10 @@ function DevelopmentAssessmentsSection({
                   <td>{assessment.comment || "Bez komentara"}</td>
 
                   {canManage && (
-                    <td className="text-end">
+                    <td className="text-end development-assessments-actions-cell">
+                      <div className="development-assessments-actions">
                       <button
-                        className="btn btn-sm btn-outline-primary me-2"
+                        className="btn btn-sm btn-outline-primary text-nowrap"
                         onClick={() => onStartEditAssessment(assessment)}
                       >
                         <FaEdit className="me-2" />
@@ -171,12 +177,13 @@ function DevelopmentAssessmentsSection({
                       </button>
 
                       <button
-                        className="btn btn-sm btn-outline-danger"
+                        className="btn btn-sm btn-outline-danger text-nowrap"
                         onClick={() => onDeleteAssessment(assessment)}
                       >
                         <FaTrashAlt className="me-2" />
                         Obriši
                       </button>
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -187,11 +194,6 @@ function DevelopmentAssessmentsSection({
       </div>
     </div>
   );
-}
-
-function formatDate(value) 
-{
-  return new Date(value).toLocaleDateString("sr-RS");
 }
 
 export default DevelopmentAssessmentsSection;
