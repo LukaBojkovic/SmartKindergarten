@@ -9,8 +9,8 @@ import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import "@fontsource/inter/800.css";
-import "./styles/custom.css";
 import './index.css'
+import "./styles/custom.css";
 import App from './App.jsx'
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { ConfirmProvider } from "./context/ConfirmContext.jsx";

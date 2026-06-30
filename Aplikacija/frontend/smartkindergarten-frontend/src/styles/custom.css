@@ -1,16 +1,32 @@
 :root {
   --sk-primary: #4f8f70;
   --sk-primary-dark: #3d7359;
-  --sk-secondary: #f4b860;
-  --sk-bg: #f7f9f6;
-  --sk-card-border: #e3e8e1;
-  --sk-text-muted: #6c757d;
+  --sk-primary-soft: #79b796;
+  --sk-secondary: #d8a84e;
+  --sk-bg: #202824;
+  --sk-login-bg: #29301f;
+  --sk-surface: #26312c;
+  --sk-surface-soft: #2d3933;
+  --sk-card-border: #46534d;
+  --sk-text: #ecefed;
+  --sk-text-muted: #b6bdb8;
+  --bs-body-bg: var(--sk-bg);
+  --bs-body-color: var(--sk-text);
+  --bs-border-color: var(--sk-card-border);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background-color: var(--sk-bg);
 }
 
 body {
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   background-color: var(--sk-bg);
+  color: var(--sk-text);
   font-size: 0.95rem;
 }
 
@@ -33,6 +49,7 @@ h6,
 }
 
 .navbar .nav-link {
+  color: rgba(255, 255, 255, 0.74) !important;
   font-weight: 500;
 }
 
@@ -96,6 +113,7 @@ h6,
 .btn-primary {
   background-color: var(--sk-primary);
   border-color: var(--sk-primary);
+  color: #ffffff;
 }
 
 .btn-primary:hover,
@@ -105,22 +123,37 @@ h6,
 }
 
 .btn-outline-primary {
-  color: var(--sk-primary);
+  color: var(--sk-primary-soft);
   border-color: var(--sk-primary);
 }
 
 .btn-outline-primary:hover {
   background-color: var(--sk-primary);
   border-color: var(--sk-primary);
+  color: #ffffff;
+}
+
+.btn-outline-secondary {
+  color: #c2cbc6;
+  border-color: #596861;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  background-color: #344039;
+  border-color: #6a7a72;
+  color: #ffffff;
 }
 
 .card {
+  background-color: var(--sk-surface);
   border: 1px solid var(--sk-card-border);
   border-radius: 14px;
+  color: var(--sk-text);
 }
 
 .card.shadow-sm {
-  box-shadow: 0 0.25rem 0.75rem rgba(34, 64, 49, 0.08) !important;
+  box-shadow: 0 0.8rem 1.8rem rgba(0, 0, 0, 0.18) !important;
 }
 
 .card-title {
@@ -128,13 +161,26 @@ h6,
 }
 
 .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--sk-text);
+  --bs-table-border-color: var(--sk-card-border);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.025);
+  --bs-table-striped-color: var(--sk-text);
+  --bs-table-hover-bg: rgba(79, 143, 112, 0.12);
+  --bs-table-hover-color: var(--sk-text);
   margin-bottom: 0;
 }
 
 .table thead th {
-  background-color: #eef4ec;
-  color: #2f4f3c;
+  background-color: #304039;
+  color: #d8e8dc;
   font-weight: 700;
+}
+
+.table-primary {
+  --bs-table-bg: rgba(79, 143, 112, 0.26);
+  --bs-table-color: var(--sk-text);
+  --bs-table-border-color: rgba(121, 183, 150, 0.3);
 }
 
 .app-table th,
@@ -238,14 +284,33 @@ h6,
 }
 
 .alert-info {
-  background-color: #edf6f1;
-  border-color: #cfe8d8;
-  color: #315b42;
+  background-color: rgba(79, 143, 112, 0.16);
+  border-color: rgba(121, 183, 150, 0.36);
+  color: #d7eadf;
 }
 
 .alert-secondary {
-  background-color: #f1f3f2;
-  border-color: #dfe5e1;
+  background-color: #2b342f;
+  border-color: var(--sk-card-border);
+  color: var(--sk-text-muted);
+}
+
+.alert-danger {
+  background-color: rgba(200, 92, 92, 0.18);
+  border-color: rgba(200, 92, 92, 0.45);
+  color: #f0c4c4;
+}
+
+.alert-warning {
+  background-color: rgba(216, 168, 78, 0.18);
+  border-color: rgba(216, 168, 78, 0.42);
+  color: #f1d9a5;
+}
+
+.alert-success {
+  background-color: rgba(79, 143, 112, 0.2);
+  border-color: rgba(121, 183, 150, 0.42);
+  color: #d9eee2;
 }
 
 .container,
@@ -259,7 +324,7 @@ h6,
 
 .page-header h1 {
   font-weight: 800;
-  color: #274536;
+  color: var(--sk-text);
 }
 
 .page-header p {
@@ -276,13 +341,43 @@ h6,
 .form-label {
   margin-bottom: 0.45rem;
   font-weight: 600;
-  color: #365343;
+  color: #e6ece8;
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+  background-color: #1f2824;
+  border-color: #52605a;
+  color: var(--sk-text);
+}
+
+.form-control::placeholder {
+  color: #9aa39f;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  background-color: #202523;
+  color: #8d9691;
 }
 
 .form-control:focus,
 .form-select:focus {
   border-color: var(--sk-primary);
+  background-color: #1f2824;
+  color: var(--sk-text);
   box-shadow: 0 0 0 0.2rem rgba(79, 143, 112, 0.18);
+}
+
+.form-check-input {
+  background-color: #1f2824;
+  border-color: #596861;
+}
+
+.form-check-input:checked {
+  background-color: var(--sk-primary);
+  border-color: var(--sk-primary);
 }
 
 .react-datepicker-wrapper {
@@ -297,13 +392,156 @@ h6,
   width: 100%;
 }
 
+.react-datepicker,
+.react-datepicker__header,
+.react-datepicker__time-container,
+.react-datepicker__time-box {
+  background-color: var(--sk-surface);
+  border-color: var(--sk-card-border);
+  color: var(--sk-text);
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header,
+.react-datepicker__day,
+.react-datepicker__day-name,
+.react-datepicker__time-list-item {
+  color: var(--sk-text);
+}
+
+.react-datepicker__day:hover,
+.react-datepicker__time-list-item:hover {
+  background-color: rgba(79, 143, 112, 0.22) !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected,
+.react-datepicker__time-list-item--selected {
+  background-color: var(--sk-primary) !important;
+  color: #ffffff !important;
+}
+
+.card [class*="-control"] {
+  background-color: #1f2824;
+  border-color: #52605a;
+  color: var(--sk-text);
+  box-shadow: none;
+}
+
+.card [class*="-control"]:hover {
+  border-color: var(--sk-primary);
+}
+
+.card [class*="-menu"] {
+  background-color: var(--sk-surface);
+  border: 1px solid var(--sk-card-border);
+  color: var(--sk-text);
+  overflow: hidden;
+  z-index: 20;
+}
+
+.card [class*="-option"] {
+  background-color: transparent;
+  color: var(--sk-text);
+}
+
+.card [class*="-option"]:hover {
+  background-color: rgba(79, 143, 112, 0.18);
+}
+
+.card [class*="-singleValue"],
+.card [class*="-multiValueLabel"],
+.card [class*="-input"] {
+  color: var(--sk-text) !important;
+}
+
+.card [class*="-placeholder"] {
+  color: #9aa39f;
+}
+
+.card [class*="-multiValue"] {
+  background-color: rgba(79, 143, 112, 0.22);
+}
+
+.card [class*="-indicatorSeparator"] {
+  background-color: #52605a;
+}
+
 .dropdown-menu {
+  background-color: #26312c;
   border-radius: 12px;
   border-color: var(--sk-card-border);
+  color: var(--sk-text);
 }
 
 .dropdown-item {
+  color: var(--sk-text);
   font-weight: 500;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: rgba(79, 143, 112, 0.18);
+  color: #ffffff;
+}
+
+.dropdown-header,
+.dropdown-divider,
+.form-text,
+.text-muted {
+  color: var(--sk-text-muted) !important;
+}
+
+.dropdown-divider {
+  border-top-color: var(--sk-card-border);
+}
+
+.list-group-item {
+  background-color: var(--sk-surface);
+  border-color: var(--sk-card-border);
+  color: var(--sk-text);
+}
+
+.page-link {
+  background-color: var(--sk-surface);
+  border-color: var(--sk-card-border);
+  color: var(--sk-primary-soft);
+}
+
+.page-link:hover,
+.page-link:focus {
+  background-color: rgba(79, 143, 112, 0.18);
+  border-color: rgba(121, 183, 150, 0.42);
+  color: #ffffff;
+}
+
+.page-item.active .page-link {
+  background-color: var(--sk-primary);
+  border-color: var(--sk-primary);
+  color: #ffffff;
+}
+
+.page-item.disabled .page-link {
+  background-color: #222b27;
+  border-color: #3d4944;
+  color: #87928d;
+}
+
+.modal-content {
+  background-color: var(--sk-surface);
+  border-color: var(--sk-card-border);
+  color: var(--sk-text);
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--sk-card-border);
+}
+
+.btn-close {
+  filter: invert(1) grayscale(100%);
+  opacity: 0.75;
 }
 
 .dropdown-item:active {
@@ -459,15 +697,15 @@ h6,
 .dashboard-card:hover {
   transform: translateY(-2px);
   border-color: rgba(79, 143, 112, 0.45);
-  box-shadow: 0 0.5rem 1rem rgba(34, 64, 49, 0.12) !important;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.24) !important;
 }
 
 .dashboard-card-icon {
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background-color: rgba(79, 143, 112, 0.14);
-  color: var(--sk-primary);
+  background-color: rgba(79, 143, 112, 0.2);
+  color: var(--sk-primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -498,7 +736,7 @@ h6,
   margin-top: 1rem;
   margin-bottom: 0.5rem;
   font-size: 1.25rem;
-  color: #274536;
+  color: var(--sk-text);
 }
 
 .account-detail-list {
@@ -515,15 +753,15 @@ h6,
   padding: 0.85rem;
   border: 1px solid var(--sk-card-border);
   border-radius: 10px;
-  background-color: #f8fbf7;
+  background-color: var(--sk-surface-soft);
 }
 
 .account-detail-icon {
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background-color: rgba(79, 143, 112, 0.14);
-  color: var(--sk-primary);
+  background-color: rgba(79, 143, 112, 0.18);
+  color: var(--sk-primary-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -581,16 +819,17 @@ h6,
 
 .login-page {
   background:
-    radial-gradient(circle at top left, rgba(244, 184, 96, 0.28), transparent 32rem),
-    linear-gradient(135deg, #eef6f1 0%, #f8fbf7 48%, #fff7e8 100%);
+    radial-gradient(circle at top left, rgba(79, 143, 112, 0.28), transparent 32rem),
+    radial-gradient(circle at bottom right, rgba(216, 168, 78, 0.24), transparent 30rem),
+    linear-gradient(135deg, #30361f 0%, #223328 52%, #342811 100%);
 }
 
 .login-info-panel {
   border-radius: 14px;
   padding: 2.5rem;
   color: #ffffff;
-  background: linear-gradient(135deg, var(--sk-primary), #2f5f47);
-  box-shadow: 0 1rem 2rem rgba(34, 64, 49, 0.16);
+  background: linear-gradient(135deg, #3d765b, #2f634a);
+  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.26);
 }
 
 .login-info-panel h1 {
@@ -633,7 +872,14 @@ h6,
 }
 
 .login-card {
+  background-color: #26312c;
+  border-color: #46534d;
   border-radius: 14px;
+  color: var(--sk-text);
+}
+
+.login-card .card-body {
+  color: var(--sk-text);
 }
 
 .payments-table-wrapper {
