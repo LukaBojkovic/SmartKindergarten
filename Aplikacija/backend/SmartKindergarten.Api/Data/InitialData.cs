@@ -169,7 +169,7 @@ namespace SmartKindergarten.Api.Data
                     ("Uroš", "Milenković", UtcDate(2021, 6, 29))
                 ],
                 [
-                    ("Mihajlo", "Popović", UtcDate(2020, 1, 9)),
+                    ("Petar", "Marković", UtcDate(2020, 1, 9)),
                     ("Una", "Matić", UtcDate(2020, 2, 16)),
                     ("Aleksa", "Savić", UtcDate(2020, 3, 22)),
                     ("Teodora", "Stevanović", UtcDate(2020, 4, 18)),
@@ -186,7 +186,7 @@ namespace SmartKindergarten.Api.Data
                     ("Matija", "Milić", UtcDate(2020, 5, 23))
                 ],
                 [
-                    ("Vanja", "Babić", UtcDate(2019, 1, 15)),
+                    ("Marko", "Marković", UtcDate(2019, 1, 15)),
                     ("Petra", "Dimitrijević", UtcDate(2019, 2, 9)),
                     ("Danilo", "Lazarević", UtcDate(2019, 3, 27)),
                     ("Kalina", "Perić", UtcDate(2019, 4, 12)),
@@ -241,6 +241,27 @@ namespace SmartKindergarten.Api.Data
             int childIndex = 0;
             int parentCounter = 1;
 
+            User markovicMother = CreateUser(
+                username: $"parent{parentCounter:000}",
+                email: $"parent{parentCounter:000}@smartkindergarten.rs",
+                firstName: "Marija",
+                lastName: "Marković",
+                role: UserRole.Parent,
+                passwordHash: parentPasswordHash);
+
+            parentCounter++;
+
+            User markovicFather = CreateUser(
+                username: $"parent{parentCounter:000}",
+                email: $"parent{parentCounter:000}@smartkindergarten.rs",
+                firstName: "Vojislav",
+                lastName: "Marković",
+                role: UserRole.Parent,
+                passwordHash: parentPasswordHash);
+
+            parentCounter++;
+            parentUsers.AddRange([markovicMother, markovicFather]);
+
             for (int groupIndex = 0; groupIndex < groups.Count; groupIndex++)
             {
                 KindergartenGroup group = groups[groupIndex];
@@ -261,30 +282,40 @@ namespace SmartKindergarten.Api.Data
 
                     children.Add(child);
 
-                    User primaryParent = CreateUser(
-                        username: $"parent{parentCounter:000}",
-                        email: $"parent{parentCounter:000}@smartkindergarten.rs",
-                        firstName: motherNames[childIndex % motherNames.Length],
-                        lastName: lastName,
-                        role: UserRole.Parent,
-                        passwordHash: parentPasswordHash);
+                    bool isMarkovicSibling =
+                        lastName == "Marković" &&
+                        (firstName == "Mila" || firstName == "Petar" || firstName == "Marko");
 
-                    parentCounter++;
-                    parentUsers.Add(primaryParent);
+                    User primaryParent = markovicMother;
+                    User? secondaryParent = markovicFather;
 
-                    User? secondaryParent = null;
-                    if (childIndex % 3 != 0)
+                    if (!isMarkovicSibling)
                     {
-                        secondaryParent = CreateUser(
+                        primaryParent = CreateUser(
                             username: $"parent{parentCounter:000}",
                             email: $"parent{parentCounter:000}@smartkindergarten.rs",
-                            firstName: fatherNames[childIndex % fatherNames.Length],
+                            firstName: motherNames[childIndex % motherNames.Length],
                             lastName: lastName,
                             role: UserRole.Parent,
                             passwordHash: parentPasswordHash);
 
                         parentCounter++;
-                        parentUsers.Add(secondaryParent);
+                        parentUsers.Add(primaryParent);
+
+                        secondaryParent = null;
+                        if (childIndex % 3 != 0)
+                        {
+                            secondaryParent = CreateUser(
+                                username: $"parent{parentCounter:000}",
+                                email: $"parent{parentCounter:000}@smartkindergarten.rs",
+                                firstName: fatherNames[childIndex % fatherNames.Length],
+                                lastName: lastName,
+                                role: UserRole.Parent,
+                                passwordHash: parentPasswordHash);
+
+                            parentCounter++;
+                            parentUsers.Add(secondaryParent);
+                        }
                     }
 
                     parentLinks.Add((child, primaryParent, secondaryParent));

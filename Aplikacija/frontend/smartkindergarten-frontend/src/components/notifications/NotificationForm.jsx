@@ -72,6 +72,7 @@ function NotificationForm({
             )}
 
             <Select
+              classNamePrefix="app-select"
               value={selectedRecipients}
               onChange={onRecipientsChange}
               options={recipientOptions}

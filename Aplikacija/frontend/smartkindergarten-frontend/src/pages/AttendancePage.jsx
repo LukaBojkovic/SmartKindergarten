@@ -5,7 +5,7 @@ import groupsApi from "../api/groupsApi";
 import AttendanceFilters from "../components/attendance/AttendanceFilters";
 import GroupAttendanceTable from "../components/attendance/GroupAttendanceTable";
 import { useAuth } from "../hooks/useAuth";
-import { FaSyncAlt } from "react-icons/fa";
+import { FaLock, FaSyncAlt, FaUnlock } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConfirm } from "../hooks/useConfirm";
 import { USER_ROLES } from "../constants/userRoles";
@@ -20,6 +20,9 @@ function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState(getTodayDateInputValue());
 
   const [attendance, setAttendance] = useState(null);
+  const [lockedAttendanceKeys, setLockedAttendanceKeys] = useState(
+    getLockedAttendanceKeys
+  );
 
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
   const [isLoadingAttendance, setIsLoadingAttendance] = useState(false);
@@ -30,6 +33,11 @@ function AttendancePage() {
   const canManage = user?.role === USER_ROLES.TEACHER;
 
   const selectedGroupId = selectedGroupOption?.value;
+  const attendanceLockKey =
+    selectedGroupId && selectedDate ? `${selectedGroupId}:${selectedDate}` : "";
+  const isAttendanceLocked = Boolean(
+    attendanceLockKey && lockedAttendanceKeys[attendanceLockKey]
+  );
 
   useEffect(() => {
     let isCancelled = false;
@@ -120,12 +128,15 @@ function AttendancePage() {
     label: group.name,
   }));
 
-  const loadAttendance = async () => {
+  const loadAttendance = async ({ showLoading = true } = {}) => {
     if (!selectedGroupId || !selectedDate) {
       return;
     }
 
-    setIsLoadingAttendance(true);
+    if (showLoading) {
+      setIsLoadingAttendance(true);
+    }
+
     setError("");
 
     try {
@@ -139,7 +150,9 @@ function AttendancePage() {
       setError(getErrorMessage(requestError));
       setAttendance(null);
     } finally {
-      setIsLoadingAttendance(false);
+      if (showLoading) {
+        setIsLoadingAttendance(false);
+      }
     }
   };
 
@@ -151,8 +164,34 @@ function AttendancePage() {
     setSelectedGroupOption(option);
   };
 
+  const toggleAttendanceLock = () => {
+    if (!attendanceLockKey) {
+      return;
+    }
+
+    const nextLockedKeys = { ...lockedAttendanceKeys };
+
+    if (isAttendanceLocked) {
+      delete nextLockedKeys[attendanceLockKey];
+      setLockedAttendanceKeys(nextLockedKeys);
+      saveLockedAttendanceKeys(nextLockedKeys);
+      toast.info("Evidencija prisustva je otključana.");
+      return;
+    }
+
+    nextLockedKeys[attendanceLockKey] = true;
+    setLockedAttendanceKeys(nextLockedKeys);
+    saveLockedAttendanceKeys(nextLockedKeys);
+      toast.info("Evidencija prisustva je zaključana.");
+  };
+
   const handleSaveAttendance = async (child, isPresent) => {
     if (!selectedDate) {
+      return;
+    }
+
+    if (isAttendanceLocked) {
+      toast.info("Evidencija je zaključana. Otključaj je pre izmene.");
       return;
     }
 
@@ -170,15 +209,11 @@ function AttendancePage() {
         await attendanceApi.update(child.attendanceId, {
           isPresent,
         });
-
-        toast.success("Prisustvo je uspešno ažurirano.");
       } else {
         await attendanceApi.create(attendanceData);
-
-        toast.success("Prisustvo je uspešno evidentirano.");
       }
 
-      await loadAttendance();
+      await loadAttendance({ showLoading: false });
     } catch (requestError) {
       toast.error(getErrorMessage(requestError));
     } finally {
@@ -188,6 +223,11 @@ function AttendancePage() {
 
   const handleDeleteAttendance = async (child) => {
     if (!child.attendanceId) {
+      return;
+    }
+
+    if (isAttendanceLocked) {
+      toast.info("Evidencija je zaključana. Otključaj je pre brisanja.");
       return;
     }
 
@@ -226,14 +266,35 @@ function AttendancePage() {
           </p>
         </div>
 
-        <button
-          className="btn btn-outline-primary"
-          onClick={loadAttendance}
-          disabled={!selectedGroupId || isLoadingAttendance}
-        >
-          <FaSyncAlt className="me-2" />
-          Osveži
-        </button>
+        <div className="d-flex gap-2">
+          {canManage && selectedGroupId && selectedDate && (
+            <button
+              className={
+                isAttendanceLocked
+                  ? "btn btn-warning"
+                  : "btn btn-outline-warning"
+              }
+              type="button"
+              onClick={toggleAttendanceLock}
+            >
+              {isAttendanceLocked ? (
+                <FaUnlock className="me-2" />
+              ) : (
+                <FaLock className="me-2" />
+              )}
+              {isAttendanceLocked ? "Otključaj" : "Zaključaj"}
+            </button>
+          )}
+
+          <button
+            className="btn btn-outline-primary"
+            onClick={loadAttendance}
+            disabled={!selectedGroupId || isLoadingAttendance}
+          >
+            <FaSyncAlt className="me-2" />
+            Osveži
+          </button>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
@@ -257,6 +318,7 @@ function AttendancePage() {
         attendance={attendance}
         isLoading={isLoadingAttendance}
         canManage={canManage}
+        isLocked={isAttendanceLocked}
         savingChildId={savingChildId}
         onSaveAttendance={handleSaveAttendance}
         onDeleteAttendance={handleDeleteAttendance}
@@ -275,6 +337,21 @@ function getErrorMessage(error) {
   }
 
   return "Došlo je do greške. Proveri da li backend radi i da li imaš dozvolu.";
+}
+
+function getLockedAttendanceKeys() {
+  try {
+    return JSON.parse(localStorage.getItem("lockedAttendanceKeys") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveLockedAttendanceKeys(lockedAttendanceKeys) {
+  localStorage.setItem(
+    "lockedAttendanceKeys",
+    JSON.stringify(lockedAttendanceKeys)
+  );
 }
 
 export default AttendancePage;

@@ -133,6 +133,12 @@ namespace SmartKindergarten.Api.Services
             if (child == null)
                 return (false, "Dete nije pronađeno.");
 
+            if (child.GroupId == groupId)
+                return (false, "Dete je već dodeljeno ovoj grupi.");
+
+            if (child.GroupId.HasValue)
+                return (false, "Dete je već dodeljeno drugoj grupi. Prvo ga uklonite iz trenutne grupe.");
+
             child.GroupId = groupId;
             await _context.SaveChangesAsync();
 

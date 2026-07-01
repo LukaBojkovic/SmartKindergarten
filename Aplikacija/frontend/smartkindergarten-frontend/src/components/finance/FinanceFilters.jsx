@@ -24,6 +24,7 @@ function FinanceFilters({
           <div className="col-lg-4">
             <label className="form-label">Dete</label>
             <Select
+              classNamePrefix="app-select"
               value={selectedChildOption}
               onChange={onChildChange}
               options={childOptions}

@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import AppNavbar from "./components/AppNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
@@ -17,6 +18,22 @@ import AccountPage from "./pages/AccountPage";
 import { USER_ROLES } from "./constants/userRoles";
 
 function App() {
+  useEffect(() => {
+    const handleInvalidField = (event) => {
+      event.preventDefault();
+
+      toast.warning("Popuni sva obavezna polja pre čuvanja.", {
+        toastId: "required-fields-warning",
+      });
+    };
+
+    document.addEventListener("invalid", handleInvalidField, true);
+
+    return () => {
+      document.removeEventListener("invalid", handleInvalidField, true);
+    };
+  }, []);
+
   return (
     <>
       <AppNavbar />

@@ -30,6 +30,7 @@ function FinancePage() {
   const { user } = useAuth();
   const confirm = useConfirm();
   const monthlyReportRef = useRef(null);
+  const previousFinanceChildIdRef = useRef(null);
 
   const today = new Date();
 
@@ -69,6 +70,7 @@ function FinancePage() {
   const canManagePayments = user?.role === USER_ROLES.ADMINISTRATIVE_STAFF;
 
   const selectedChildId = selectedChildOption?.value;
+  const currentUserId = getCurrentUserId(user);
 
   const expectedAmount = useMemo(() => {
     const parsedMonthlyFee = Number(monthlyFee);
@@ -227,14 +229,17 @@ function FinancePage() {
 
   useEffect(() => {
     if (!selectedChildId) {
+      previousFinanceChildIdRef.current = null;
       setPayments([]);
       setFinanceStatus(null);
       return;
     }
 
     let isCancelled = false;
+    const isSameChild = previousFinanceChildIdRef.current === selectedChildId;
 
-    setIsLoadingFinance(true);
+    setIsLoadingFinance(!isSameChild);
+    previousFinanceChildIdRef.current = selectedChildId;
 
     Promise.all([
       paymentsApi.getByChild(selectedChildId),
@@ -390,7 +395,10 @@ function FinancePage() {
   };
 
   const startEdit = (payment) => {
-    if (!canManagePayments) {
+    if (
+      !canManagePayments ||
+      Number(payment.recordedById) !== Number(currentUserId)
+    ) {
       return;
     }
 
@@ -418,7 +426,10 @@ function FinancePage() {
   };
 
   const deletePayment = async (payment) => {
-    if (!canManagePayments) {
+    if (
+      !canManagePayments ||
+      Number(payment.recordedById) !== Number(currentUserId)
+    ) {
       return;
     }
 
@@ -550,6 +561,7 @@ function FinancePage() {
         payments={filteredPayments}
         isLoading={isLoadingFinance}
         canManage={canManagePayments}
+        currentUserId={currentUserId}
         onStartEdit={startEdit}
         onDelete={deletePayment}
       />
@@ -600,6 +612,10 @@ function getPageDescription(role) {
   }
 
   return "Pregled uplata i finansijskog statusa za vaše dete.";
+}
+
+function getCurrentUserId(user) {
+  return user?.id ?? user?.userId ?? user?.userID ?? null;
 }
 
 function getErrorMessage(error) {

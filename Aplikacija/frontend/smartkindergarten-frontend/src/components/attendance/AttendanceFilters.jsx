@@ -18,6 +18,7 @@ function AttendanceFilters({
           <div className="col-md-8">
             <label className="form-label">Grupa</label>
             <Select
+              classNamePrefix="app-select"
               value={selectedGroupOption}
               onChange={onGroupChange}
               options={groupOptions}

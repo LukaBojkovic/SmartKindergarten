@@ -8,14 +8,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Kontroleri
 builder.Services.AddControllers();
 
-// Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddScoped<SystemSettingsService>();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<DailyReportService>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -38,19 +33,19 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Baza
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Servisi
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ChildService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<DevelopmentProfileService>();
 builder.Services.AddScoped<AttendanceService>();
+builder.Services.AddScoped<DailyReportService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<SystemSettingsService>();
 
-// CORS za React frontend
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
@@ -62,7 +57,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// JWT podešavanja
 string? jwtKey = builder.Configuration["Jwt:Key"];
 string? issuer = builder.Configuration["Jwt:Issuer"];
 string? audience = builder.Configuration["Jwt:Audience"];
@@ -99,14 +93,12 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Swagger samo u development modu
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Middleware redosled
 app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
@@ -117,7 +109,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Seed početnih podataka
 await InitialData.InitializeAsync(app.Services);
 
 app.Run();

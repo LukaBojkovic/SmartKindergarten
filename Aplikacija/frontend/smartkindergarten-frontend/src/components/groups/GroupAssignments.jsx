@@ -43,6 +43,7 @@ function GroupAssignments({
               <div className="d-flex gap-2 mb-3">
                 <div className="flex-fill">
                   <Select
+                    classNamePrefix="app-select"
                     value={selectedChildOption}
                     onChange={onChildOptionChange}
                     options={childOptions}
@@ -115,6 +116,7 @@ function GroupAssignments({
               <div className="d-flex gap-2 mb-3">
                 <div className="flex-fill">
                   <Select
+                    classNamePrefix="app-select"
                     value={selectedTeacherOption}
                     onChange={onTeacherOptionChange}
                     options={teacherOptions}

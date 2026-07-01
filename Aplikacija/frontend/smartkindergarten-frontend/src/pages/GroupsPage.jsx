@@ -279,6 +279,18 @@ function GroupsPage()
 
     setError("");
 
+    const selectedChild = childrenList.find(
+      (child) => child.id === selectedChildOption.value
+    );
+
+    const childAlreadyInAnyGroup = Boolean(selectedChild?.groupId);
+
+    if (childAlreadyInAnyGroup) {
+      toast.info("Dete je već dodeljeno grupi. Prvo ga ukloni iz trenutne grupe.");
+      setSelectedChildOption(null);
+      return;
+    }
+
     try 
     {
       await groupsApi.assignChild(selectedGroup.id, selectedChildOption.value);
@@ -404,10 +416,12 @@ function GroupsPage()
     }
   };
 
-  const childOptions = childrenList.map((child) => ({
-    value: child.id,
-    label: `${child.firstName} ${child.lastName} (${child.groupName || "bez grupe"})`,
-  }));
+  const childOptions = childrenList
+    .filter((child) => !child.groupId)
+    .map((child) => ({
+      value: child.id,
+      label: `${child.firstName} ${child.lastName} (bez grupe)`,
+    }));
 
   const teacherOptions = teachers.map((teacher) => ({
     value: teacher.id,

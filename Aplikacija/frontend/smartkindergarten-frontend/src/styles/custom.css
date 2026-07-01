@@ -456,6 +456,14 @@ h6,
   color: var(--sk-text) !important;
 }
 
+.card [class*="-input"] input {
+  color: var(--sk-text) !important;
+}
+
+.card [class*="-valueContainer"] {
+  color: var(--sk-text);
+}
+
 .card [class*="-placeholder"] {
   color: #9aa39f;
 }
@@ -466,6 +474,74 @@ h6,
 
 .card [class*="-indicatorSeparator"] {
   background-color: #52605a;
+}
+
+.app-select__control,
+.app-select__control:hover {
+  background-color: #1f2824 !important;
+  border-color: #52605a !important;
+  box-shadow: none !important;
+}
+
+.app-select__control--is-focused,
+.app-select__control--is-focused:hover {
+  border-color: var(--sk-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(79, 143, 112, 0.18) !important;
+}
+
+.app-select__input-container,
+.app-select__input-container input,
+.app-select__single-value,
+.app-select__multi-value__label {
+  color: var(--sk-text) !important;
+}
+
+.app-select__placeholder {
+  color: #9aa39f !important;
+}
+
+.app-select__menu {
+  background-color: var(--sk-surface) !important;
+  border: 1px solid var(--sk-card-border);
+  overflow: hidden;
+  z-index: 20;
+}
+
+.app-select__option {
+  background-color: transparent !important;
+  color: var(--sk-text) !important;
+}
+
+.app-select__option--is-focused {
+  background-color: rgba(79, 143, 112, 0.18) !important;
+}
+
+.app-select__option--is-selected {
+  background-color: var(--sk-primary) !important;
+  color: #ffffff !important;
+}
+
+.app-select__multi-value {
+  background-color: rgba(79, 143, 112, 0.22) !important;
+}
+
+.app-select__multi-value__remove {
+  color: var(--sk-text-muted) !important;
+}
+
+.app-select__multi-value__remove:hover {
+  background-color: rgba(200, 92, 92, 0.28) !important;
+  color: #ffffff !important;
+}
+
+.app-select__indicator,
+.app-select__clear-indicator,
+.app-select__dropdown-indicator {
+  color: var(--sk-text-muted) !important;
+}
+
+.app-select__indicator-separator {
+  background-color: #52605a !important;
 }
 
 .dropdown-menu {

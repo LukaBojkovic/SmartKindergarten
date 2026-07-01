@@ -4,6 +4,7 @@ import { formatDateTime } from "../../utils/formatters";
 function DevelopmentNotesSection({
   notes,
   canManage,
+  currentUserId,
   noteForm,
   editingNoteId,
   isSaving,
@@ -68,7 +69,11 @@ function DevelopmentNotesSection({
         )}
 
         <div className="list-group">
-          {notes.map((note) => (
+          {notes.map((note) => {
+            const canModifyNote =
+              canManage && Number(note.teacherId) === Number(currentUserId);
+
+            return (
             <div key={note.id} className="list-group-item">
               <div className="d-flex justify-content-between align-items-start">
                 <div>
@@ -80,7 +85,7 @@ function DevelopmentNotesSection({
                   </small>
                 </div>
 
-                {canManage && (
+                {canModifyNote && (
                   <div className="d-flex gap-2">
                     <button
                       className="btn btn-sm btn-outline-primary"
@@ -101,7 +106,8 @@ function DevelopmentNotesSection({
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

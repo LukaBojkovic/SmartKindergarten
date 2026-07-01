@@ -5,6 +5,7 @@ function PaymentsTable({
   payments,
   isLoading,
   canManage,
+  currentUserId,
   onStartEdit,
   onDelete,
 }) {
@@ -42,7 +43,12 @@ function PaymentsTable({
                 </tr>
               )}
 
-              {payments.map((payment) => (
+              {payments.map((payment) => {
+                const canModifyPayment =
+                  canManage &&
+                  Number(payment.recordedById) === Number(currentUserId);
+
+                return (
                 <tr key={payment.id}>
                   <td>{payment.childFullName}</td>
                   <td>{formatCurrency(payment.amount)}</td>
@@ -52,7 +58,8 @@ function PaymentsTable({
 
                   {canManage && (
                     <td className="text-end">
-                      <div className="dropdown">
+                      {canModifyPayment ? (
+                        <div className="dropdown">
                         <button
                           className="btn btn-sm btn-outline-primary dropdown-toggle"
                           type="button"
@@ -88,11 +95,15 @@ function PaymentsTable({
                             </button>
                           </li>
                         </ul>
-                      </div>
+                        </div>
+                      ) : (
+                        <span className="text-muted small">Tuđa uplata</span>
+                      )}
                     </td>
                   )}
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

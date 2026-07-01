@@ -56,6 +56,7 @@ function DevelopmentProfilePage()
   const [error, setError] = useState("");
 
   const canManage = user?.role === USER_ROLES.TEACHER;
+  const currentUserId = getCurrentUserId(user);
   const selectedChildId = selectedChildOption?.value;
 
   useEffect(() => {
@@ -225,6 +226,10 @@ function DevelopmentProfilePage()
   };
 
   const startEditNote = (note) => {
+    if (!canEditDevelopmentEntry(note, currentUserId)) {
+      return;
+    }
+
     setEditingNoteId(note.id);
     setNoteForm({
       content: note.content,
@@ -239,6 +244,10 @@ function DevelopmentProfilePage()
   };
 
   const deleteNote = async (note) => {
+    if (!canEditDevelopmentEntry(note, currentUserId)) {
+      return;
+    }
+
     const confirmed = await confirm({
       title: "Brisanje beleške",
       message: "Da li sigurno želiš da obrišeš belešku?",
@@ -336,6 +345,10 @@ function DevelopmentProfilePage()
   };
 
   const startEditAssessment = (assessment) => {
+    if (!canEditDevelopmentEntry(assessment, currentUserId)) {
+      return;
+    }
+
     setEditingAssessmentId(assessment.id);
     setAssessmentForm({
       area: assessment.area,
@@ -346,6 +359,12 @@ function DevelopmentProfilePage()
 
     setSelectedArea(assessment.area);
     setError("");
+
+    setTimeout(() => {
+      document
+        .getElementById("development-assessment-section")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   const cancelEditAssessment = () => {
@@ -358,6 +377,10 @@ function DevelopmentProfilePage()
   };
 
   const deleteAssessment = async (assessment) => {
+    if (!canEditDevelopmentEntry(assessment, currentUserId)) {
+      return;
+    }
+
     const confirmed = await confirm({
       title: "Brisanje procene razvoja",
       message: "Da li sigurno želiš da obrišeš procenu razvoja?",
@@ -438,6 +461,7 @@ function DevelopmentProfilePage()
             assessmentForm={assessmentForm}
             editingAssessmentId={editingAssessmentId}
             canManage={canManage}
+            currentUserId={currentUserId}
             isSaving={isSaving}
             onAreaFilterChange={handleAreaFilterChange}
             onAssessmentChange={handleAssessmentChange}
@@ -450,6 +474,7 @@ function DevelopmentProfilePage()
           <DevelopmentNotesSection
             notes={notes}
             canManage={canManage}
+            currentUserId={currentUserId}
             noteForm={noteForm}
             editingNoteId={editingNoteId}
             isSaving={isSaving}
@@ -470,6 +495,14 @@ function getChildLabel(child)
   const groupPart = child.groupName ? ` - ${child.groupName}` : " - bez grupe";
 
   return `${child.firstName} ${child.lastName}${groupPart}`;
+}
+
+function getCurrentUserId(user) {
+  return user?.id ?? user?.userId ?? user?.userID ?? null;
+}
+
+function canEditDevelopmentEntry(entry, currentUserId) {
+  return Number(entry.teacherId) === Number(currentUserId);
 }
 
 function getErrorMessage(error) 

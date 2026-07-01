@@ -12,6 +12,7 @@ function DevelopmentAssessmentsSection({
   assessmentForm,
   editingAssessmentId,
   canManage,
+  currentUserId,
   isSaving,
   onAreaFilterChange,
   onAssessmentChange,
@@ -21,7 +22,10 @@ function DevelopmentAssessmentsSection({
   onDeleteAssessment,
 }) {
   return (
-    <div className="card shadow-sm mb-4">
+    <div
+      id="development-assessment-section"
+      className="card shadow-sm mb-4"
+    >
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="card-title mb-0">Procene razvoja</h5>
@@ -40,7 +44,11 @@ function DevelopmentAssessmentsSection({
         </div>
 
         {canManage && (
-          <form onSubmit={onAssessmentSubmit} className="mb-4">
+          <form
+            id="development-assessment-form"
+            onSubmit={onAssessmentSubmit}
+            className="mb-4"
+          >
             <div className="row g-3">
               <div className="col-md-4">
                 <label className="form-label">Oblast razvoja</label>
@@ -153,7 +161,12 @@ function DevelopmentAssessmentsSection({
                 </tr>
               )}
 
-              {assessments.map((assessment) => (
+              {assessments.map((assessment) => {
+                const canModifyAssessment =
+                  canManage &&
+                  Number(assessment.teacherId) === Number(currentUserId);
+
+                return (
                 <tr key={assessment.id}>
                   <td>{formatDate(assessment.assessmentDate)}</td>
                   <td>{getDevelopmentAreaLabel(assessment.area)}</td>
@@ -167,7 +180,8 @@ function DevelopmentAssessmentsSection({
 
                   {canManage && (
                     <td className="text-end development-assessments-actions-cell">
-                      <div className="development-assessments-actions">
+                      {canModifyAssessment && (
+                        <div className="development-assessments-actions">
                       <button
                         className="btn btn-sm btn-outline-primary text-nowrap"
                         onClick={() => onStartEditAssessment(assessment)}
@@ -183,11 +197,13 @@ function DevelopmentAssessmentsSection({
                         <FaTrashAlt className="me-2" />
                         Obriši
                       </button>
-                      </div>
+                        </div>
+                      )}
                     </td>
                   )}
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

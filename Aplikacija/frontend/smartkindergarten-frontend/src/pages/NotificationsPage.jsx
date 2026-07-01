@@ -236,12 +236,17 @@ function NotificationsPage() {
 
     try {
       if (editingNotificationId) {
-        await notificationsApi.update(editingNotificationId, {
+        await notificationsApi.create({
           title: form.title,
           content: form.content,
+          recipientUserIds: selectedRecipients.map(
+            (recipient) => recipient.value
+          ),
         });
 
-        toast.success("Obaveštenje je uspešno izmenjeno.");
+        await notificationsApi.delete(editingNotificationId);
+
+        toast.success("Obaveštenje je izmenjeno i ponovo poslato primaocima.");
       } else {
         await notificationsApi.create({
           title: form.title,

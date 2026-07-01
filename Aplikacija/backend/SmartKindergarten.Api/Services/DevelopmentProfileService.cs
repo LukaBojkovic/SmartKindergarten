@@ -79,6 +79,9 @@ namespace SmartKindergarten.Api.Services
             if (note == null)
                 return (false, "Beleška nije pronađena.", null);
 
+            if (note.TeacherId != teacherId)
+                return (false, "Nemate pravo da menjate ovu belešku.", null);
+
             bool canManage = await CanManageChildDevelopmentAsync(note.ChildId, teacherId);
 
             if (!canManage)
@@ -100,6 +103,9 @@ namespace SmartKindergarten.Api.Services
 
             if (note == null)
                 return (false, "Beleška nije pronađena.");
+
+            if (note.TeacherId != teacherId)
+                return (false, "Nemate pravo da obrišete ovu belešku.");
 
             bool canManage = await CanManageChildDevelopmentAsync(note.ChildId, teacherId);
 
@@ -198,6 +204,9 @@ namespace SmartKindergarten.Api.Services
             if (assessment == null)
                 return (false, "Procena razvoja nije pronađena.", null);
 
+            if (assessment.TeacherId != teacherId)
+                return (false, "Nemate pravo da menjate ovu procenu.", null);
+
             bool canManage = await CanManageChildDevelopmentAsync(assessment.ChildId, teacherId);
 
             if (!canManage)
@@ -242,6 +251,9 @@ namespace SmartKindergarten.Api.Services
 
             if (assessment == null)
                 return (false, "Procena razvoja nije pronađena.");
+
+            if (assessment.TeacherId != teacherId)
+                return (false, "Nemate pravo da obrišete ovu procenu.");
 
             bool canManage = await CanManageChildDevelopmentAsync(assessment.ChildId, teacherId);
 

@@ -62,6 +62,7 @@ function DailyReportsPage() {
   const [error, setError] = useState("");
 
   const canCreate = user?.role === USER_ROLES.TEACHER;
+  const currentUserId = getCurrentUserId(user);
   const isParent = user?.role === USER_ROLES.PARENT;
   const selectedChild = childrenList.find(
     (child) => String(child.id) === String(childFilter)
@@ -69,7 +70,9 @@ function DailyReportsPage() {
   const selectedChildGroupId = selectedChild?.groupId;
   const selectedChildHasNoGroup = isParent && selectedChild && !selectedChildGroupId;
 
-  const canEditReport = () => user?.role === USER_ROLES.TEACHER;
+  const canEditReport = (report) =>
+    user?.role === USER_ROLES.TEACHER &&
+    Number(report.teacherId) === Number(currentUserId);
 
   const canDeleteReport = canEditReport;
 
@@ -369,6 +372,10 @@ const handleClearImage = () => {
   };
 
   const startEdit = (report) => {
+    if (!canEditReport(report)) {
+      return;
+    }
+
     setEditingReportId(report.id);
 
     setForm({
@@ -395,6 +402,10 @@ const handleClearImage = () => {
   };
 
   const deleteReport = async (report) => {
+    if (!canDeleteReport(report)) {
+      return;
+    }
+
     const confirmed = await confirm({
       title: "Brisanje dnevnog izveštaja",
       message: `Da li sigurno želiš da obrišeš dnevni izveštaj "${report.title}"?`,
@@ -589,6 +600,10 @@ function getReportsRequest({
   return groupFilter
     ? dailyReportsApi.getByGroup(groupFilter)
     : dailyReportsApi.getAll();
+}
+
+function getCurrentUserId(user) {
+  return user?.id ?? user?.userId ?? user?.userID ?? null;
 }
 
 function getErrorMessage(error) {

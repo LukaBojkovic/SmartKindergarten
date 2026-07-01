@@ -12,6 +12,7 @@ function ChildDevelopmentSelector({
         <h5 className="card-title">Izbor deteta</h5>
 
         <Select
+          classNamePrefix="app-select"
           value={selectedChildOption}
           onChange={onChildChange}
           options={childOptions}

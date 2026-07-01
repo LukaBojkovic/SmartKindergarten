@@ -123,8 +123,9 @@ namespace SmartKindergarten.Api.Services
             if (report == null)
                 return (false, "Dnevni izveštaj nije pronađen.", null);
 
-            bool isReportTeacher = currentUserRole == UserRole.Teacher.ToString() &&
-                await _context.TeacherGroups.AnyAsync(tg => tg.TeacherId == currentUserId && tg.GroupId == report.GroupId);
+            bool isReportTeacher =
+                currentUserRole == UserRole.Teacher.ToString() &&
+                report.TeacherId == currentUserId;
 
             if (!isReportTeacher)
                 return (false, "Nemate pravo da menjate ovaj dnevni izveštaj.", null);
@@ -158,9 +159,9 @@ namespace SmartKindergarten.Api.Services
             if (report == null)
                 return (false, "Dnevni izveštaj nije pronađen.");
 
-            bool isReportTeacher = currentUserRole == UserRole.Teacher.ToString() &&
-                await _context.TeacherGroups.AnyAsync(tg => tg.TeacherId == currentUserId && 
-                tg.GroupId == report.GroupId);
+            bool isReportTeacher =
+                currentUserRole == UserRole.Teacher.ToString() &&
+                report.TeacherId == currentUserId;
 
             if (!isReportTeacher)
                 return (false, "Nemate pravo da obrišete ovaj dnevni izveštaj.");

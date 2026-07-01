@@ -179,6 +179,9 @@ namespace SmartKindergarten.Api.Controllers
             if (payment == null)
                 return NotFound("Uplata nije pronađena.");
 
+            if (payment.RecordedById != GetCurrentUserId())
+                return Forbid();
+
             if (request.Amount.HasValue)
             {
                 if (request.Amount.Value <= 0)
@@ -206,6 +209,9 @@ namespace SmartKindergarten.Api.Controllers
 
             if (payment == null)
                 return NotFound("Uplata nije pronađena.");
+
+            if (payment.RecordedById != GetCurrentUserId())
+                return Forbid();
 
             _context.Payments.Remove(payment);
             await _context.SaveChangesAsync();

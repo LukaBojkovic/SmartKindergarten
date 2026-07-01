@@ -5,6 +5,7 @@ function GroupAttendanceTable({
   attendance,
   isLoading,
   canManage,
+  isLocked,
   savingChildId,
   onSaveAttendance,
   onDeleteAttendance,
@@ -37,6 +38,12 @@ function GroupAttendanceTable({
             {attendance.children.length}
           </div>
         </div>
+
+        {canManage && isLocked && (
+          <div className="alert alert-warning py-2">
+            Evidencija je zaključana. Otključaj je pre izmene prisustva.
+          </div>
+        )}
 
         <div className="table-responsive">
           <table className="table table-striped table-hover align-middle">
@@ -87,6 +94,7 @@ function GroupAttendanceTable({
                         <button
                           className="btn btn-outline-success"
                           disabled={
+                            isLocked ||
                             savingChildId === child.childId ||
                             (child.isRecorded && child.isPresent)
                           }
@@ -98,6 +106,7 @@ function GroupAttendanceTable({
                         <button
                           className="btn btn-outline-danger"
                           disabled={
+                            isLocked ||
                             savingChildId === child.childId ||
                             (child.isRecorded && !child.isPresent)
                           }
@@ -109,7 +118,7 @@ function GroupAttendanceTable({
                         {child.isRecorded && (
                           <button
                             className="btn btn-outline-secondary"
-                            disabled={savingChildId === child.childId}
+                            disabled={isLocked || savingChildId === child.childId}
                             onClick={() => onDeleteAttendance(child)}
                           >
                             <FaTrashAlt className="me-2" />

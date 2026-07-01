@@ -62,7 +62,9 @@ namespace SmartKindergarten.Api.Services
                 .Include(n => n.Sender)
                 .Include(n => n.Recipients)
                     .ThenInclude(r => r.User)
-                .Where(n => n.Recipients.Any(r => r.UserId == currentUserId))
+                .Where(n =>
+                    n.SenderId == currentUserId ||
+                    n.Recipients.Any(r => r.UserId == currentUserId))
                 .OrderByDescending(n => n.CreatedAt)
                 .Select(n => ToDto(n))
                 .ToListAsync();
@@ -180,10 +182,9 @@ namespace SmartKindergarten.Api.Services
             if (notification == null)
                 return (false, "Notifikacija nije pronađena.", null);
 
-            bool isAdmin = currentUserRole == UserRole.Administrator.ToString();
             bool isSender = notification.SenderId == currentUserId;
 
-            if (!isAdmin && !isSender)
+            if (!isSender)
                 return (false, "Nemate pravo da menjate ovu notifikaciju.", null);
 
             notification.Title = request.Title.Trim();
