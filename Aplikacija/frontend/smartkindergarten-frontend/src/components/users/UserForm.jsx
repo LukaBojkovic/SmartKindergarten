@@ -119,6 +119,23 @@ function UserForm({
 
         <form onSubmit={onEditSubmit}>
           <div className="mb-3">
+            <label className="form-label">Korisničko ime</label>
+            <input
+              name="username"
+              className="form-control"
+              value={editForm.username}
+              onChange={onEditChange}
+              disabled={isEditingAdministrator}
+              required
+            />
+            {isEditingAdministrator && (
+              <div className="form-text">
+                Promena korisničkog imena administratora nije dozvoljena.
+              </div>
+            )}
+          </div>
+
+          <div className="mb-3">
             <label className="form-label">Email</label>
             <input
               name="email"

@@ -20,6 +20,7 @@ const initialCreateForm = {
 };
 
 const initialEditForm = {
+  username: "",
   email: "",
   firstName: "",
   lastName: "",
@@ -164,6 +165,7 @@ function UsersPage()
 
     setEditingUserId(user.id);
     setEditForm({
+      username: user.username,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,

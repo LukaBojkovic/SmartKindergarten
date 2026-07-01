@@ -98,6 +98,24 @@ namespace SmartKindergarten.Api.Services
             if (user == null)
                 return (false, "Korisnik nije pronađen.", null);
 
+            if (request.Username != null)
+            {
+                if (string.IsNullOrWhiteSpace(request.Username))
+                    return (false, "Korisničko ime je obavezno.", null);
+
+                string username = request.Username.Trim();
+
+                if (user.Role == UserRole.Administrator && username != user.Username)
+                    return (false, "Nije dozvoljeno menjanje korisničkog imena administratora.", null);
+
+                bool usernameExists = await _context.Users
+                    .AnyAsync(u => u.Username == username && u.Id != id);
+
+                if (usernameExists)
+                    return (false, "Korisničko ime već postoji.", null);
+
+                user.Username = username;
+            }
 
             if (!string.IsNullOrWhiteSpace(request.Email))
             {
